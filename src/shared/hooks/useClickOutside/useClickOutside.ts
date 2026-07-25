@@ -1,19 +1,19 @@
 import { useEffect, useRef } from 'react';
 
 export interface UseClickOutsideOptions {
-  doubleEvent?: boolean;           // если true — двойной клик / даблтап
-  doubleTapDelay?: number;         // интервал для double-tap (мс)
+  doubleEvent?: boolean;           // when true, listen for a double-click / double-tap instead
+  doubleTapDelay?: number;         // max gap between taps to count as a double-tap (ms)
 }
 
 /**
- * Хук для отслеживания кликов вне указанного элемента.
+ * Tracks clicks that land outside a given element.
  * 
- * @template T - тип HTML-элемента (например, HTMLDivElement)
- * @param {React.RefObject<T>} ref - ссылка на элемент, вне которого нужно отслеживать клики
- * @param {() => void} callback - функция, которая вызывается при клике или даблтапе вне элемента
- * @param {UseClickOutsideOptions} [options] - дополнительные опции
- * @param {boolean} [options.doubleEvent=false] - если true, срабатывает только на двойной клик (ПК) или double-tap (мобильные)
- * @param {number} [options.doubleTapDelay=300] - максимальный интервал между двумя тачами для распознавания double-tap (мс)
+ * @template T - the HTML element type (e.g. HTMLDivElement)
+ * @param {React.RefObject<T>} ref - ref to the element to watch for outside clicks
+ * @param {() => void} callback - called when a click or double-tap lands outside the element
+ * @param {UseClickOutsideOptions} [options] - additional options
+ * @param {boolean} [options.doubleEvent=false] - when true, only fires on a double-click (desktop) or double-tap (mobile)
+ * @param {number} [options.doubleTapDelay=300] - maximum gap between two touches for them to register as a double-tap (ms)
  */
 export function useClickOutside<T extends HTMLElement>(
   ref: React.RefObject<T>,
