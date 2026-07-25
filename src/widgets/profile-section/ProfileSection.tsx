@@ -67,14 +67,24 @@ export default function ProfileSection() {
       )}
 
       <div className="flex gap-2.5 mt-[22px]">
-        <div className="flex-1 basis-0" data-testid="profile-order-count">
+        {/*
+          The count and the screen that lists what it counted, rather than a second copy
+          of the history rendered here. Same shape as the notifications tile beside it:
+          a button, because it navigates, and it navigates because /orders exists.
+        */}
+        <button
+          type="button"
+          className="flex-1 basis-0 text-left cursor-pointer"
+          data-testid="profile-order-count"
+          onClick={() => router.push('/orders')}
+        >
           <div className={TILE_CLASS}>
             <b className="h3-bold">{ordersHydrated ? orders.length : '—'}</b>
             <span className="h6-regular text-gray-500">
               {orders.length === 1 ? 'Order placed' : 'Orders placed'}
             </span>
           </div>
-        </div>
+        </button>
 
         {/*
           A tile that leads somewhere real: the inbox this count is read from. It is a

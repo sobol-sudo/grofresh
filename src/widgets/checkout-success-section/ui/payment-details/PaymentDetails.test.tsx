@@ -73,14 +73,34 @@ describe("PaymentDetails component", () => {
     expect(screen.getByText("3")).toBeInTheDocument();
   });
 
-  // "Order history" led nowhere and was removed
-  it("offers exactly one exit", () => {
+  /*
+    "Order history" was this screen's green primary CTA with no onClick whatsoever, and
+    the previous fix was to delete it — the history it promised had nowhere to be shown.
+    /orders exists now, so the button is back, and the thing worth asserting is no longer
+    that there is one exit but that every exit on the screen actually goes somewhere.
+  */
+  it("offers two exits and no dead control", () => {
     render(<PaymentDetails order={order} />);
 
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(1);
-    expect(buttons[0]).toHaveTextContent("Back to home");
-    expect(screen.queryByText("Order history")).not.toBeInTheDocument();
+    expect(buttons).toHaveLength(2);
+    expect(buttons[0]).toHaveTextContent("Order history");
+    expect(buttons[1]).toHaveTextContent("Back to home");
+
+    buttons.forEach((button) => {
+      mockReplace.mockClear();
+      fireEvent.click(button);
+      expect(mockReplace).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  // The button that used to do nothing
+  it("opens the order history", () => {
+    render(<PaymentDetails order={order} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /order history/i }));
+
+    expect(mockReplace).toHaveBeenCalledWith("/orders");
   });
 
   // Leaving replaces the terminal screen so it cannot be revisited with Back

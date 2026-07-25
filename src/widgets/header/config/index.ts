@@ -33,6 +33,12 @@ export const headerConfig = {
     centerName: true,
     title: 'Notifications',
   },
+  '/orders': {
+    backRoute: true,
+    centerName: true,
+    title: 'Order history',
+    cartIcon: true,
+  },
   '/profile': {
     backRoute: true,
     centerName: true,

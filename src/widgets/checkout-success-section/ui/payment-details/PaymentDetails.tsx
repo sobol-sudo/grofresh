@@ -11,10 +11,21 @@ export default function PaymentDetails({ order }: PaymentDetailsProps) {
 
   const itemCount = order.items.reduce((acc, item) => acc + item.quantity, 0)
 
-  const navigateToHome = () => {
+  /*
+    Both exits leave the same way. The receipt paints the page green, so the transition
+    is killed before routing away — otherwise the body fades from green to white behind
+    the next screen. And both `replace` rather than `push`: this screen is terminal, and
+    the order that unlocks it is still in memory, so Back onto it would replay a receipt
+    for a purchase that has already been acknowledged.
+  */
+  const leaveTo = (route: string) => {
     document.body.style.transition = `none`
-    router.replace('/')
+    router.replace(route)
   }
+
+  const navigateToOrderHistory = () => leaveTo('/orders')
+
+  const navigateToHome = () => leaveTo('/')
 
   return (
     <div className="container flex flex-col bg-white p-[16px_24px] rounded-[10px_10px_0_0]">
@@ -78,8 +89,18 @@ export default function PaymentDetails({ order }: PaymentDetailsProps) {
         <div className="w-full border-b border-light-silver mt-3 mb-2.5"></div>
       </div>
 
+      {/*
+        The primary CTA is back, and it goes somewhere now. It used to be the green
+        button on this screen with no handler at all — the order it was offering to show
+        was already being persisted, there just was no screen to show it on. There is one.
+      */}
       <div className="flex flex-col gap-[7px] mt-2.5">
-        <Button colorType="success" sx={{ height: '58px', borderRadius: '50px', textTransform: 'none', }} onClick={navigateToHome}>
+        <Button colorType="success" sx={{ height: '58px', borderRadius: '50px', textTransform: 'none', }} onClick={navigateToOrderHistory}>
+          <span className="h5-bold">
+            Order history
+          </span></Button>
+
+        <Button sx={{ height: '58px', borderRadius: '50px', textTransform: 'none', }} onClick={navigateToHome}>
           <span className="h5-bold">
             Back to home
           </span></Button>
