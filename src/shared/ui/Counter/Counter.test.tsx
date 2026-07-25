@@ -9,13 +9,13 @@ describe('Counter component', () => {
     handleChange.mockClear();
   });
 
-  // Проверяет, что компонент рендерит текущее количество
+  // Renders the current quantity
   test('renders the current quantity', () => {
     render(<Counter quantity={quantity} handleChange={handleChange} />);
     expect(screen.getByTestId('counter-quantity')).toBeInTheDocument();
   });
 
-  // Проверяет, что при клике на кнопку уменьшения вызывается handleChange с аргументом "decrease"
+  // Clicking the decrement button calls handleChange with "decrease"
   test('clicking decrement button calls handleChange with "decrease"', () => {
     render(<Counter quantity={quantity} handleChange={handleChange} />);
     fireEvent.click(screen.getByTestId('btn-decrease'));
@@ -23,7 +23,7 @@ describe('Counter component', () => {
     expect(handleChange).toHaveBeenCalledWith('decrease');
   });
 
-  // Проверяет, что при клике на кнопку увеличения вызывается handleChange с аргументом "increment"
+  // Clicking the increment button calls handleChange with "increment"
   test('clicking increment button calls handleChange with "increment"', () => {
     render(<Counter quantity={quantity} handleChange={handleChange} />);
     fireEvent.click(screen.getByTestId('btn-increment'));
