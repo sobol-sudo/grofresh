@@ -20,7 +20,7 @@ describe("PaymentCard component", () => {
     (hooks.useAppDispatch as jest.Mock).mockReturnValue(mockDispatch);
   });
 
-  // Отображает информацию о карте
+  // Renders the card details
   it("renders card info correctly", () => {
     (hooks.useAppSelector as jest.Mock).mockReturnValue(card);
 
@@ -30,13 +30,13 @@ describe("PaymentCard component", () => {
     expect(screen.getByAltText("payment-method")).toHaveAttribute("src", "/mastercard.png");
   });
 
-  // Не рендерится, если карта отсутствует
+  // Renders nothing when there is no card
   it("does not render if card is null", () => {
     render(<PaymentCard card={null} />);
     expect(screen.queryByText("Mastercard")).not.toBeInTheDocument();
   });
 
-  // Вызывает dispatch toggleCurrentCard при клике на карту
+  // Dispatches toggleCurrentCard when the card is clicked
   it("dispatches toggleCurrentCard on card click", () => {
     (hooks.useAppSelector as jest.Mock).mockReturnValue(null);
 
@@ -47,7 +47,7 @@ describe("PaymentCard component", () => {
     expect(mockDispatch).toHaveBeenCalledWith(toggleCurrentCard(card));
   });
 
-  // Не вызывает dispatch если isLastCard = true
+  // Does not dispatch when isLastCard is true
   it("does not dispatch if isLastCard is true", () => {
     (hooks.useAppSelector as jest.Mock).mockReturnValue(null);
 
@@ -58,7 +58,7 @@ describe("PaymentCard component", () => {
     expect(mockDispatch).not.toHaveBeenCalled();
   });
 
-  // Checkbox отражает состояние checked
+  // The checkbox reflects the checked state
   it("Checkbox reflects checked state", () => {
     (hooks.useAppSelector as jest.Mock).mockReturnValue(card);
 
