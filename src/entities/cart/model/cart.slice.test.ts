@@ -1,7 +1,7 @@
 import { cartReducer, toggleCartItem, incrementItem, decrementOrRemoveItem, clearLastProduct, selectedCartQuantity, selectedCartItems, selectedProduct, ProductState, toggleSelectedProduct, selectedCartCount, allPriceCart } from './cart.slice';
 import { IProduct } from '@/entities/product';
 
-// Моковые товары для тестов
+// Mock products used across the tests
 const mockProduct: IProduct = {
   id: 1,
   name: 'Spinach',
@@ -28,7 +28,7 @@ const anotherProduct: IProduct = {
 
 describe('cartSlice reducers', () => {
 
-  // Проверяет добавление нового товара в корзину и установку selectedProduct
+  // Adds a new product to the cart and sets selectedProduct
   test('toggleCartItem adds a new item with quantity 1 and sets selectedProduct', () => {
     const state = cartReducer(undefined, toggleCartItem(mockProduct));
     expect(state.items).toHaveLength(1);
@@ -36,7 +36,7 @@ describe('cartSlice reducers', () => {
     expect(state.selectedProduct?.id).toBe(mockProduct.id);
   });
 
-  // Проверяет удаление товара из корзины, если он уже выбран
+  // Removes a product from the cart when it is already selected
   test('toggleCartItem removes item from cart when it is already selected', () => {
     const initialState: ProductState = {
       items: [
@@ -53,7 +53,7 @@ describe('cartSlice reducers', () => {
     expect(state.selectedProduct).toBeNull();
   });
 
-  // Проверяет, что при повторном нажатии товар удаляется из корзины и не остаётся в списке
+  // Toggling a second time removes the product and leaves no trace in the list
   test('toggleCartItem existing item not selected sets selectedProduct to quantity 0', () => {
     const initialState: ProductState = {
       items: [
@@ -74,7 +74,7 @@ describe('cartSlice reducers', () => {
     expect(state.items).toHaveLength(1);
   });
 
-  // Проверяет повторное добавление одного и того же товара (toggle)
+  // Adding the same product twice toggles it back off
   test('toggleCartItem removes item if it already exists', () => {
     let state = cartReducer(undefined, toggleCartItem(mockProduct));
     state = cartReducer(state, toggleCartItem(mockProduct)); // toggle remove
@@ -82,7 +82,7 @@ describe('cartSlice reducers', () => {
     expect(state.selectedProduct).toBeNull();
   });
 
-  // Проверяет увеличение quantity товара
+  // Increments a product's quantity
   test('incrementItem increases quantity of existing item', () => {
     let state = cartReducer(undefined, toggleCartItem(mockProduct));
     state = cartReducer(state, incrementItem(mockProduct));
@@ -90,7 +90,7 @@ describe('cartSlice reducers', () => {
     expect(state.selectedProduct?.id).toBe(mockProduct.id);
   });
 
-  // Проверяет корректное увеличение quantity, если оно > 1
+  // Increments quantity correctly when it is already greater than 1
   test('incrementItem increases quantity correctly when quantity > 1', () => {
     const initialState: ProductState = {
       items: [{ ...mockProduct, quantity: 2 }],
@@ -100,7 +100,7 @@ describe('cartSlice reducers', () => {
     expect(state.items[0].quantity).toBe(3);
   });
 
-  // Проверяет корректное увеличение quantity, если оно 0 и товара нет в корзине
+  // Increments quantity correctly when it is 0 and the product is not in the cart
   test('incrementItem adds new product with quantity 1 if not in cart', () => {
     const initialState: ProductState = {
       items: [],
@@ -110,7 +110,7 @@ describe('cartSlice reducers', () => {
     expect(state.items[0].quantity).toBe(1);
   });
 
-  // Проверяет, что увеличение quantity не изменяет другие товары в корзине
+  // Incrementing one product's quantity leaves the other cart items untouched
   test('incrementItem does not change other items', () => {
     const initialState: ProductState = {
       items: [
@@ -124,7 +124,7 @@ describe('cartSlice reducers', () => {
     expect(state.items.find(i => i.id === anotherProduct.id)?.quantity).toBe(3);
   });
 
-  // Проверяет уменьшение quantity и удаление товара при достижении 0
+  // Decrements quantity and removes the product once it reaches 0
   test('decrementOrRemoveItem decreases quantity and removes item when quantity reaches 0', () => {
     let state = cartReducer(undefined, toggleCartItem(mockProduct)); // quantity 1
     state = cartReducer(state, incrementItem(mockProduct)); // quantity 2
@@ -138,44 +138,44 @@ describe('cartSlice reducers', () => {
   });
 
 
-  // Проверяет поведение decrementOrRemoveItem, если товар для удаления не найден в корзине
+  // decrementOrRemoveItem is a no-op when the product is not in the cart
   test('decrementOrRemoveItem does not change the shopping cart if the current product is not found.', () => {
-    // Добавляем mockProduct в корзину
+    // Add mockProduct to the cart
     let state = cartReducer(undefined, toggleCartItem(mockProduct));
-    // Сохраняем копию исходного состояния для сравнения
+    // Keep a copy of the original state to compare against
     const initialItems = [...state.items];
 
-    // Пытаемся уменьшить или удалить другой товар (anotherProduct), которого нет в корзине
+    // Try to decrement/remove anotherProduct, which is not in the cart
     state = cartReducer(state, decrementOrRemoveItem(anotherProduct));
 
-    // Длина корзины осталась прежней
+    // The cart length is unchanged
     expect(state.items).toHaveLength(initialItems.length);
 
-    // Содержимое корзины не изменилось
+    // The cart contents are unchanged
     expect(state.items).toEqual(initialItems);
 
-    // Можно дополнительно проверить, что товар в корзине — именно mockProduct
+    // And the item still in the cart is exactly mockProduct
     expect(state.items[0]).toEqual(mockProduct);
   });
 
-  // Тесты для toggleSelectedProduct
+  // Tests for toggleSelectedProduct
   describe('toggleSelectedProduct', () => {
 
-    // Проверяет установку selectedProduct, если ничего не выбрано
+    // Sets selectedProduct when nothing is selected yet
     test('sets selectedProduct if none is selected', () => {
       const initialState: ProductState = { items: [], selectedProduct: null };
       const state = cartReducer(initialState, toggleSelectedProduct(mockProduct));
       expect(state.selectedProduct).toEqual(mockProduct);
     });
 
-    // Проверяет смену выбранного продукта на другой
+    // Switches the selection to a different product
     test('sets selectedProduct to new product if different is selected', () => {
       const initialState: ProductState = { items: [], selectedProduct: mockProduct };
       const state = cartReducer(initialState, toggleSelectedProduct(anotherProduct));
       expect(state.selectedProduct).toEqual(anotherProduct);
     });
 
-    // Проверяет сброс selectedProduct при повторном выборе того же товара
+    // Clears selectedProduct when the same product is selected again
     test('resets selectedProduct to null if same product is toggled', () => {
       const initialState: ProductState = { items: [], selectedProduct: mockProduct };
       const state = cartReducer(initialState, toggleSelectedProduct(mockProduct));
@@ -183,7 +183,7 @@ describe('cartSlice reducers', () => {
     });
   });
 
-  // Проверяет, что удаление одного товара не влияет на другие товары
+  // Removing one product does not affect the others
   test('decrementOrRemoveItem does not affect other items', () => {
     let state = cartReducer(undefined, toggleCartItem(mockProduct));
     state = cartReducer(state, toggleCartItem(anotherProduct));
@@ -192,7 +192,7 @@ describe('cartSlice reducers', () => {
     expect(state.items[0].id).toBe(anotherProduct.id);
   });
 
-  // Проверяет сброс selectedProduct через clearLastProduct
+  // clearLastProduct resets selectedProduct
   test('clearLastProduct sets selectedProduct to null', () => {
     let state = cartReducer(undefined, toggleCartItem(mockProduct));
     state = cartReducer(state, clearLastProduct());
@@ -200,10 +200,10 @@ describe('cartSlice reducers', () => {
   });
 });
 
-// Тесты для селекторов
+// Tests for the selectors
 describe('cartSlice selectors', () => {
 
-  // Проверяет получение всех товаров
+  // Returns every item in the cart
   test('selectedCartItems returns all items', () => {
     const state: { cart: ProductState } = { cart: { items: [], selectedProduct: null } };
     state.cart = cartReducer(state.cart, toggleCartItem(mockProduct));
@@ -213,7 +213,7 @@ describe('cartSlice selectors', () => {
     expect(items.map(i => i.id)).toEqual([mockProduct.id, anotherProduct.id]);
   });
 
-  // Проверяет возвращение последнего выбранного товара
+  // Returns the most recently selected product
   test('selectedProduct returns last modified product', () => {
     const state: { cart: ProductState } = { cart: { items: [], selectedProduct: null } };
     state.cart = cartReducer(state.cart, toggleCartItem(mockProduct));
@@ -223,7 +223,7 @@ describe('cartSlice selectors', () => {
     expect(selectedProduct(state)?.id).toBe(anotherProduct.id);
   });
 
-  // Проверяет корректную сумму quantity
+  // Sums the quantities correctly
   test('selectedCartQuantity sums quantities correctly', () => {
     const state = {
       cart: {
@@ -237,13 +237,13 @@ describe('cartSlice selectors', () => {
     expect(selectedCartQuantity(state)).toBe(5);
   });
 
-  // Проверяет поведение при пустой корзине
+  // Behaviour with an empty cart
   test('selectedCartQuantity returns 0 for empty cart', () => {
     const state = { cart: { items: [], selectedProduct: null } };
     expect(selectedCartQuantity(state)).toBe(0);
   });
 
-  // Проверяет количество разных товаров в корзине
+  // Counts the distinct products in the cart
   test('selectedCartCount returns the correct number of unique items', () => {
     const state = { cart: { items: [], selectedProduct: null } };
 
@@ -254,7 +254,7 @@ describe('cartSlice selectors', () => {
     expect(selectedCartCount(state2)).toBe(2);
   });
 
-  // allPriceCart возвращает корректные цены всех товаров(и их сумарное количество) в корзине
+  // allPriceCart returns the correct total price for every item in the cart (quantities included)
   test('allPriceCart returns the correct prices of all products (and their total quantity) in the shopping cart', () => {
     const state = { cart: { items: [{ ...mockProduct, price: 2.51 }, { ...anotherProduct, price: 2.52 }], selectedProduct: null } };
 
