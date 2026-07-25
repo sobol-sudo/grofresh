@@ -2,7 +2,7 @@ import { render, fireEvent } from '@testing-library/react';
 import { useClickOutside, UseClickOutsideOptions } from './useClickOutside';
 import { useRef } from 'react';
 
-// Вспомогательный компонент для тестирования хука
+// Helper component used to exercise the hook
 function TestComponent({ callback, options }: { callback: () => void; options?: UseClickOutsideOptions }) {
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref as React.RefObject<HTMLElement>, callback, options);
@@ -10,22 +10,22 @@ function TestComponent({ callback, options }: { callback: () => void; options?: 
 }
 
 describe('useClickOutside', () => {
-  it('вызывает callback при клике вне элемента', () => {
+  it('calls the callback when clicking outside the element', () => {
     const callback = jest.fn();
     const { getByText } = render(<TestComponent callback={callback} />);
 
-    // клик вне элемента
+    // click outside the element
     fireEvent.mouseDown(document);
     expect(callback).toHaveBeenCalled();
 
     callback.mockClear();
 
-    // клик внутри элемента
+    // click inside the element
     fireEvent.mouseDown(getByText('Inside'));
     expect(callback).not.toHaveBeenCalled();
   });
 
-  it('не вызывает callback при клике внутри элемента', () => {
+  it('does not call the callback when clicking inside the element', () => {
     const callback = jest.fn();
     const { getByText } = render(<TestComponent callback={callback} />);
 
@@ -33,7 +33,7 @@ describe('useClickOutside', () => {
     expect(callback).not.toHaveBeenCalled();
   });
 
-  it('работает с doubleEvent: true для dblclick', () => {
+  it('works with doubleEvent: true for dblclick', () => {
     const callback = jest.fn();
     render(<TestComponent callback={callback} options={{ doubleEvent: true }} />);
 
@@ -41,7 +41,7 @@ describe('useClickOutside', () => {
     expect(callback).toHaveBeenCalled();
   });
 
-    it('работает с обычным клик', () => {
+    it('does not call the callback on a plain click event', () => {
     const callback = jest.fn();
     render(<TestComponent callback={callback} options={{ doubleTapDelay: 300 }} />);
 
@@ -51,7 +51,7 @@ describe('useClickOutside', () => {
 
 
 
-  it('работает с doubleEvent: true для double-tap на touch', () => {
+  it('works with doubleEvent: true for a double-tap on touch', () => {
     jest.useFakeTimers();
     const callback = jest.fn();
     const doubleTapDelay = 300
@@ -66,7 +66,7 @@ describe('useClickOutside', () => {
     jest.useRealTimers(); 
   });
 
-    it('работает с doubleEvent: true для double-tap на touch без параметра doubleTapDelay', () => {
+    it('works with doubleEvent: true for a double-tap on touch without an explicit doubleTapDelay', () => {
     jest.useFakeTimers();
     const callback = jest.fn();
     const doubleTapDelay = 300
@@ -81,7 +81,7 @@ describe('useClickOutside', () => {
     jest.useRealTimers(); 
   });
 
-  it('не вызывает callback если первый touch', () => {
+  it('does not call the callback on the first touch', () => {
     jest.useFakeTimers();
     const callback = jest.fn();
     render(<TestComponent callback={callback} options={{ doubleEvent: true, doubleTapDelay: 300 }} />);
