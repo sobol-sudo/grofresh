@@ -1,4 +1,4 @@
-/* Кнопка */
+/* Button */
 button {
   background: none;
   border: none;
@@ -16,7 +16,7 @@ button:focus {
   outline: none;
 }
 
-/* Инпут */
+/* Input */
 
 
 input {
