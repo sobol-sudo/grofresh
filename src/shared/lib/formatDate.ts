@@ -1,8 +1,8 @@
 /**
- * Форматирует дату в читаемый формат
- * @param date - Дата для форматирования (по умолчанию текущая дата)
- * @param locale - Локаль для форматирования (по умолчанию "en-US")
- * @returns Отформатированная строка даты
+ * Formats a date into a human-readable string.
+ * @param date - The date to format (defaults to the current date)
+ * @param locale - The locale to format with (defaults to "en-US")
+ * @returns The formatted date string
  */
 export function formatDate(
   date: Date = new Date(),
