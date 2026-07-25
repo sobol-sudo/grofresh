@@ -7,11 +7,11 @@ describe("paymentSlice reducer", () => {
     initialState = {
       serviceFee: '1.50',
       cards: [
-        { id: 1, name: 'Mastercard', src: '/images/payments/master-card.png' },
-        { id: 2, name: 'Visa', src: '/images/payments/master-card.png' },
+        { id: 1, name: 'Mastercard •• 8802', src: '/images/payments/master-card.png' },
+        { id: 2, name: 'Mastercard •• 4417', src: '/images/payments/master-card.png' },
       ],
-      currentCard: { id: 1, name: 'Mastercard', src: '/images/payments/master-card.png' },
-      lastUsedCard: { id: 1, name: 'Mastercard', src: '/images/payments/master-card.png' },
+      currentCard: { id: 1, name: 'Mastercard •• 8802', src: '/images/payments/master-card.png' },
+      lastUsedCard: { id: 1, name: 'Mastercard •• 8802', src: '/images/payments/master-card.png' },
     };
   });
 
@@ -21,19 +21,19 @@ describe("paymentSlice reducer", () => {
     expect(state).toEqual(initialState);
   });
 
-  // currentCard is cleared when the currently selected card is toggled
-  it("should toggle current card off if selected card is the current one", () => {
-    const action = toggleCurrentCard({ id: 1, name: 'Mastercard', src: '' });
+  // Re-picking the selected card keeps it selected: checkout always has a payment method
+  it("should keep the current card selected if it is picked again", () => {
+    const action = toggleCurrentCard({ id: 1, name: 'Mastercard •• 8802', src: '' });
     const state = paymentReducer(initialState, action);
-    expect(state.currentCard).toBeNull();
+    expect(state.currentCard?.id).toBe(1);
   });
 
   // currentCard switches to a different card
   it("should set current card if different card is selected", () => {
-    const action = toggleCurrentCard({ id: 2, name: 'Visa', src: '' });
+    const action = toggleCurrentCard({ id: 2, name: 'Mastercard •• 4417', src: '' });
     const state = paymentReducer(initialState, action);
     expect(state.currentCard?.id).toBe(2);
-    expect(state.currentCard?.name).toBe('Visa');
+    expect(state.currentCard?.name).toBe('Mastercard •• 4417');
   });
 
   // currentCard is unchanged when lastUsedCard is selected and it is the only card
@@ -43,7 +43,7 @@ describe("paymentSlice reducer", () => {
       cards: [initialState.cards[0]],
       currentCard: initialState.cards[0],
     };
-    const action = toggleCurrentCard({ id: 1, name: 'Mastercard', src: '' });
+    const action = toggleCurrentCard({ id: 1, name: 'Mastercard •• 8802', src: '' });
     const state = paymentReducer(singleCardState, action);
     expect(state.currentCard?.id).toBe(1);
   });
@@ -59,17 +59,31 @@ describe("paymentSlice reducer", () => {
   // Case: lastUsedCard is null
   it('should handle case when lastUsedCard is null', () => {
     const stateWithNoLastUsed = { ...initialState, lastUsedCard: null };
-    const action = toggleCurrentCard({ id: 1, name: 'Mastercard', src: '' });
+    const action = toggleCurrentCard({ id: 1, name: 'Mastercard •• 8802', src: '' });
     const newState = paymentReducer(stateWithNoLastUsed, action);
 
-    // currentCard should become null
-    expect(newState.currentCard).toBeNull();
+    // a card stays selected regardless of which one was used last
+    expect(newState.currentCard?.id).toBe(1);
+  });
+
+  // A payment method can never be unset from the UI
+  it('never leaves the checkout without a payment method', () => {
+    let state = initialState;
+
+    for (const card of initialState.cards) {
+      state = paymentReducer(state, toggleCurrentCard(card));
+      expect(state.currentCard).not.toBeNull();
+
+      // picking the same card twice must not unset it
+      state = paymentReducer(state, toggleCurrentCard(card));
+      expect(state.currentCard?.id).toBe(card.id);
+    }
   });
   
   // Case: currentCard is null
   it('should handle case when CurrentCard is null', () => {
     const stateCurrentCard = { ...initialState, currentCard: null };
-    const action = toggleCurrentCard({ id: 1, name: 'Mastercard', src: '' });
+    const action = toggleCurrentCard({ id: 1, name: 'Mastercard •• 8802', src: '' });
     const newState = paymentReducer(stateCurrentCard, action);
 
     // currentCard should not stay null
@@ -88,11 +102,11 @@ describe('paymentSlice selectors', () => {
       payment: {
         serviceFee: '1.50',
         cards: [
-          { id: 1, name: 'Mastercard', src: '/images/payments/master-card.png' },
-          { id: 2, name: 'Visa', src: '/images/payments/master-card.png' },
+          { id: 1, name: 'Mastercard •• 8802', src: '/images/payments/master-card.png' },
+          { id: 2, name: 'Mastercard •• 4417', src: '/images/payments/master-card.png' },
         ],
-        currentCard: { id: 1, name: 'Mastercard', src: '/images/payments/master-card.png' },
-        lastUsedCard: { id: 1, name: 'Mastercard', src: '/images/payments/master-card.png' },
+        currentCard: { id: 1, name: 'Mastercard •• 8802', src: '/images/payments/master-card.png' },
+        lastUsedCard: { id: 1, name: 'Mastercard •• 8802', src: '/images/payments/master-card.png' },
       }
     };
   });
@@ -119,7 +133,7 @@ describe('paymentSlice selectors', () => {
 
   // paymentMethod selector
   it('paymentMethod selector should return current card name', () => {
-    expect(paymentMethod(state)).toBe('Mastercard');
+    expect(paymentMethod(state)).toBe('Mastercard •• 8802');
 
     // when currentCard is null
     state.payment.currentCard = null;

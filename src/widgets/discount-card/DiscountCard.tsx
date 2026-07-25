@@ -1,4 +1,3 @@
-import Button from "@/shared/ui/Button";
 import Image from 'next/image'
 
 interface DiscountCardProps {
@@ -8,14 +7,11 @@ interface DiscountCardProps {
 export default function DiscountCard({ className }: DiscountCardProps) {
   return (
     <div className={className}>
-      <div className="relative bg-green-500 w-full rounded-[30px] p-4 flex flex-col text-white overflow-hidden">
+      <div className="relative bg-green-500 w-full rounded-[30px] p-4 pb-[71px] flex flex-col text-white overflow-hidden">
         <h3 className="h3-bold">Fresh Deals <br />
           Today 20% OFF
         </h3>
         <span className="small-regular mt-2.5">Special prices on selected groceries</span>
-        <Button sx={{ marginTop: '22px', width: 'fit-content', textTransform: 'none', }}>
-          <span className="small-bold">Explore deals</span>
-        </Button>
 
         <Image
           src='/images/product-discount.png'

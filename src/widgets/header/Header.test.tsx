@@ -76,11 +76,14 @@ describe('Header component', () => {
 
       if (config?.user) expect(screen.getByTestId('user')).toBeInTheDocument();
       if (config?.backRoute) expect(screen.getByTestId('btn-navigate-back')).toBeInTheDocument();
-      if (config?.centerName) expect(screen.getByTestId('center-name')).toBeInTheDocument();
-      if (config?.dots) expect(screen.getByTestId('dots')).toBeInTheDocument();
-      if (config?.notificationIcon) expect(screen.getByTestId('notification-icon'));
+      if (config?.centerName) {
+        expect(screen.getByTestId('center-name')).toHaveTextContent(config.title as string);
+      }
       if (config?.cartIcon) expect(screen.getByTestId('cart-icon')).toBeInTheDocument();
 
+      // Notifications and the overflow menu were removed: no route may bring them back.
+      expect(screen.queryByTestId('notification-icon')).toBeNull();
+      expect(screen.queryByTestId('dots')).toBeNull();
     });
   });
 

@@ -1,27 +1,20 @@
-import { useAppDispatch, useAppSelector } from "@/app/providers/store-provider/config/hooks";
-import { clearCart } from "@/entities/cart/model/cart.slice";
 import Button from "@/shared/ui/Button";
 import { useRouter } from "next/router";
-import { allPriceCart as allPriceCartSelector } from "@/entities/cart/model/cart.slice"
-import { serviceFee as serviceFeeSelector } from "@/entities/payment/model/payment.slice"
-import { formatDate } from "@/shared/lib/formatDate";
+import type { Order } from "@/entities/order";
 
-export default function PaymentDetails() {
+interface PaymentDetailsProps {
+  order: Order;
+}
+
+export default function PaymentDetails({ order }: PaymentDetailsProps) {
   const router = useRouter()
 
-  const dispatch = useAppDispatch();
-  const serviceFee = useAppSelector(serviceFeeSelector)
-  const allPriceCart = useAppSelector(allPriceCartSelector)
-
-  const datePayment = formatDate();
-  const totalPrice = (Number(allPriceCart) > 0 ? Number(allPriceCart) + Number(serviceFee) : 0).toFixed(2)
+  const itemCount = order.items.reduce((acc, item) => acc + item.quantity, 0)
 
   const navigateToHome = () => {
     document.body.style.transition = `none`
-    dispatch(clearCart())
-    router.push('/')
+    router.replace('/')
   }
-
 
   return (
     <div className="container flex flex-col bg-white p-[16px_24px] rounded-[10px_10px_0_0]">
@@ -30,28 +23,42 @@ export default function PaymentDetails() {
       <div className="shadow mt-[22px] bg-white p-4 rounded-[30px]">
         <div className="flex justify-between">
           <span className="h6-bold">Transaction code</span>
-          <span className="h6-regular">{'556DTXGR89'}</span>
+          <span className="h6-regular" data-testid="transaction-code">{order.transactionCode}</span>
         </div>
 
         <div className="w-full border-b border-light-silver mt-3 mb-2.5"></div>
 
         <div className="flex justify-between">
           <span className="h6-bold">Payment method</span>
-          <span className="h6-regular">{'Mastercard'}</span>
+          <span className="h6-regular">{order.paymentMethod}</span>
         </div>
 
         <div className="w-full border-b border-light-silver mt-3 mb-2.5"></div>
 
         <div className="flex justify-between">
           <span className="h6-bold">Date</span>
-          <span className="h6-regular">{datePayment}</span>
+          <span className="h6-regular">{order.placedAt}</span>
+        </div>
+
+        <div className="w-full border-b border-light-silver mt-3 mb-2.5"></div>
+
+        <div className="flex justify-between">
+          <span className="h6-bold">Items</span>
+          <span className="h6-regular">{itemCount}</span>
+        </div>
+
+        <div className="w-full border-b border-light-silver mt-3 mb-2.5"></div>
+
+        <div className="flex justify-between">
+          <span className="h6-bold">Sub total</span>
+          <span className="h6-regular">${order.subtotal}</span>
         </div>
 
         <div className="w-full border-b border-light-silver mt-3 mb-2.5"></div>
 
         <div className="flex justify-between">
           <span className="h6-bold">Fee</span>
-          <span className="h6-regular">${serviceFee}</span>
+          <span className="h6-regular">${order.serviceFee}</span>
         </div>
 
         <div className="w-full border-b border-light-silver mt-3 mb-2.5"></div>
@@ -64,19 +71,15 @@ export default function PaymentDetails() {
         <div className="w-full border-b border-light-silver mt-3 mb-2.5"></div>
 
         <div className="flex justify-between">
-          <span className="h5-bold">Sub total</span>
-          <span className="h6-bold">${totalPrice}</span>
+          <span className="h5-bold">Total paid</span>
+          <span className="h6-bold">${order.total}</span>
         </div>
 
         <div className="w-full border-b border-light-silver mt-3 mb-2.5"></div>
       </div>
 
       <div className="flex flex-col gap-[7px] mt-2.5">
-        <Button colorType="success" sx={{ height: '58px', borderRadius: '50px', textTransform: 'none', }}>
-          <span className="h5-bold">
-            Order history
-          </span></Button>
-        <Button sx={{ height: '58px', borderRadius: '50px', textTransform: 'none', }} onClick={navigateToHome}>
+        <Button colorType="success" sx={{ height: '58px', borderRadius: '50px', textTransform: 'none', }} onClick={navigateToHome}>
           <span className="h5-bold">
             Back to home
           </span></Button>

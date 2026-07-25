@@ -2,13 +2,17 @@ export const headerConfig = {
   '/': {
     user: true,
     cartIcon: true,
-    notificationIcon: true,
   },
   '/cart': {
     backRoute: true,
     centerName: true,
-    notificationIcon: true,
-    dots: true,
+    title: 'Cart',
+  },
+  '/checkout-success': {
+    backRoute: true,
+    centerName: true,
+    title: 'Payment',
+    onDarkBackground: true,
   },
 };
 
@@ -17,8 +21,8 @@ export type HeaderRoute = keyof typeof headerConfig;
 export type HeaderConfig = {
   user?: boolean;
   cartIcon?: boolean;
-  notificationIcon?: boolean;
   backRoute?: boolean;
   centerName?: boolean;
-  dots?: boolean;
+  title?: string;
+  onDarkBackground?: boolean;
 };

@@ -1,4 +1,3 @@
-import useDebounce from "@/shared/hooks/useDebounce/useDebounce";
 import Input from "@/shared/ui/Input";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
@@ -10,32 +9,36 @@ type RecentItem = {
   name: string;
 };
 
+// Seeded so every entry matches something in the catalog when applied.
 const CONST_RECENT: RecentItem[] = [
-  { id: '1', name: "Apple" },
-  { id: '2', name: "Banana" },
+  { id: '1', name: "Apples" },
+  { id: '2', name: "Bananas" },
   { id: '3', name: "Milk" },
-  { id: '4', name: "Banana" },
-  { id: '5', name: "Milk" },
+  { id: '4', name: "Spinach" },
+  { id: '5', name: "Croissant" },
 ]
 
-export default function SearchRecently() {
-  const [value, setValue] = useState('');
+interface SearchRecentlyProps {
+  // The query is owned by the page, so the catalog below can react to it.
+  value: string;
+  onValueChange: (value: string) => void;
+}
+
+export default function SearchRecently({ value, onValueChange }: SearchRecentlyProps) {
   const [recent, setRecent] = useState<RecentItem[]>(CONST_RECENT);
   const [focused, setFocused] = useState(false);
   const [edit, setEdit] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null)
 
-  const debouncedValue = useDebounce(value, 100);
-
   useClickOutside(wrapperRef as React.RefObject<HTMLElement>, () => { setEdit(false); setFocused(false) })
 
   const visibleRecent = useMemo(() => {
-    if (!debouncedValue.trim()) return recent.slice(0, 5);
+    if (!value.trim()) return recent.slice(0, 5);
     return recent
-      .filter(item => item.name.toLowerCase().includes(debouncedValue.toLowerCase()))
+      .filter(item => item.name.toLowerCase().includes(value.toLowerCase()))
       .slice(0, 5);
-  }, [debouncedValue, recent]);
+  }, [value, recent]);
 
 
   const toggleEditMode = () => {
@@ -50,14 +53,14 @@ export default function SearchRecently() {
   const handleItem = (name: string) => {
     if (edit) return
 
-    setValue(name);
+    onValueChange(name);
     setFocused(false)
   }
 
   useEffect(() => {
     if (!listRef.current) return;
     const el = listRef.current;
-    if (focused && visibleRecent.length > 0) {
+    if (focused) {
       gsap.fromTo(el,
         { opacity: 0, y: -8, scale: 0.98 },
         { opacity: 1, y: 0, scale: 1, duration: 0.25, ease: "power2.out" }
@@ -69,7 +72,7 @@ export default function SearchRecently() {
 
   return (
     <div ref={wrapperRef} className="relative z-50">
-      <Input value={value} placeholder="Find groceries,or fresh product" name="search" handleChange={(e) => setValue(e.target.value)}
+      <Input value={value} placeholder="Find groceries,or fresh product" name="search" handleChange={(e) => onValueChange(e.target.value)}
         onFocus={() => setFocused(true)}
       >
         <div className="flex items-center gap-4">
@@ -84,21 +87,27 @@ export default function SearchRecently() {
       </Input>
 
       {/* Recent searches */}
-      {focused && visibleRecent.length > 0 && (
+      {focused && (
         <ul ref={listRef} className="absolute w-full flex flex-col bg-white p-3 rounded-xl shadow-md mt-2">
           <div className="flex justify-between items-center mb-2">
             <h4 className="h4-bold text-black">Recent searches</h4>
             <button className="small-regular" onClick={(e) => { e.stopPropagation(); toggleEditMode(); }}>edit</button>
           </div>
-          {visibleRecent.map(item => (
-            <RecentItem
-              key={item.id}
-              item={item}
-              edit={edit}
-              handleItem={handleItem}
-              deleteRecentItem={deleteRecentItem}
-            />
-          ))}
+          {visibleRecent.length > 0 ? (
+            visibleRecent.map(item => (
+              <RecentItem
+                key={item.id}
+                item={item}
+                edit={edit}
+                handleItem={handleItem}
+                deleteRecentItem={deleteRecentItem}
+              />
+            ))
+          ) : (
+            <li className="small-regular text-black p-2" data-testid="no-recent">
+              No recent searches match
+            </li>
+          )}
         </ul>
       )}
 

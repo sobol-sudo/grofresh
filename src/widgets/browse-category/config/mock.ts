@@ -1,5 +1,6 @@
 import { Category } from "../model/types";
 
+// Every category here has products in MOCK_PRODUCTS: selecting one always returns a result.
 export const MOCK_CATEGORIES: Category[] = [
   {
     id: 1,
@@ -25,25 +26,5 @@ export const MOCK_CATEGORIES: Category[] = [
     id: 5,
     name: "Fruits",
     image: "/images/categories/fruits.png",
-  },
-  {
-    id: 6,
-    name: "Breakfast",
-    image: "/images/categories/breakfast.png",
-  },
-  {
-    id: 7,
-    name: "Frozen",
-    image: "/images/categories/frozen.png",
-  },
-  {
-    id: 8,
-    name: "Beverages",
-    image: "/images/categories/beverages.png",
-  },
-  {
-    id: 9,
-    name: "Snacks",
-    image: "/images/categories/snacks.png",
   },
 ];

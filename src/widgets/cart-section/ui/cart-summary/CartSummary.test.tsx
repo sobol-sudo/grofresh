@@ -25,7 +25,7 @@ describe("CartSummary component", () => {
     render(<CartSummary isEmpty={false} isCheckoutMode={true} onCheckout={mockCheckout} />);
 
     expect(screen.getByText("Total : $110.00")).toBeInTheDocument();
-    expect(screen.getByText("Discount up to 5%")).toBeInTheDocument();
+    expect(screen.getByText("Includes a $10.00 service fee")).toBeInTheDocument();
   });
 
       // Renders the total price correctly when isCheckoutMode is false
@@ -38,7 +38,7 @@ describe("CartSummary component", () => {
     render(<CartSummary isEmpty={false} isCheckoutMode={false} onCheckout={mockCheckout} />);
 
     expect(screen.getByText("Total : $100.00")).toBeInTheDocument();
-    expect(screen.getByText("Discount up to 5%")).toBeInTheDocument();
+    expect(screen.getByText("Service fee added at checkout")).toBeInTheDocument();
   });
 
   // Shows a total of 0 when the cart is empty
@@ -59,7 +59,7 @@ describe("CartSummary component", () => {
 
     render(<CartSummary isEmpty={true} isCheckoutMode={false} onCheckout={mockCheckout} />);
 
-    const button = screen.getByRole("button", { name: /checkout now/i });
+    const button = screen.getByRole("button", { name: /proceed to checkout/i });
     expect(button).toBeDisabled();
   });
 
@@ -72,9 +72,33 @@ describe("CartSummary component", () => {
 
     render(<CartSummary isEmpty={false} isCheckoutMode={false} onCheckout={mockCheckout} />);
 
-    const button = screen.getByRole("button", { name: /checkout now/i });
+    const button = screen.getByRole("button", { name: /proceed to checkout/i });
     fireEvent.click(button);
 
     expect(mockCheckout).toHaveBeenCalledTimes(1);
+  });
+  // The button says what the next press will actually do
+  it("labels the button for the step it performs", () => {
+    mockUseAppSelector.mockImplementation((selector) => {
+      if (selector === allPriceCartSelector) return 100;
+      if (selector === serviceFeeSelector) return 10;
+    });
+
+    const { rerender } = render(
+      <CartSummary isEmpty={false} isCheckoutMode={false} onCheckout={mockCheckout} />
+    );
+    expect(screen.getByRole("button", { name: /proceed to checkout/i })).toBeInTheDocument();
+
+    rerender(<CartSummary isEmpty={false} isCheckoutMode={true} onCheckout={mockCheckout} />);
+    expect(screen.getByRole("button", { name: /place order/i })).toBeInTheDocument();
+  });
+
+  // The removed discount promise must not come back
+  it("does not promise a discount", () => {
+    mockUseAppSelector.mockReturnValue(0);
+
+    render(<CartSummary isEmpty={false} isCheckoutMode={true} onCheckout={mockCheckout} />);
+
+    expect(screen.queryByText(/discount/i)).not.toBeInTheDocument();
   });
 });

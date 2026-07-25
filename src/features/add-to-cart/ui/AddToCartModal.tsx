@@ -4,9 +4,11 @@ import { useCartQuantity } from '@/shared/hooks/useCartQuantity/useCartQuantity'
 import { useClickOutside } from '@/shared/hooks/useClickOutside/useClickOutside';
 import Button from '@/shared/ui/Button';
 import Counter from '@/shared/ui/Counter';
+import IconButton from '@/shared/ui/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
 export default function AddToCartModal() {
@@ -50,7 +52,21 @@ export default function AddToCartModal() {
     dispatch(clearLastProduct());
   }, [pathname, dispatch]);
 
-  useClickOutside(modalRef as React.RefObject<HTMLElement>, () => dispatch(clearLastProduct()), { doubleEvent: true, doubleTapDelay: 300 })
+  const closeModal = useCallback(() => {
+    dispatch(clearLastProduct());
+  }, [dispatch]);
+
+  // A single click or tap outside is the expected way to dismiss a sheet like this.
+  useClickOutside(modalRef as React.RefObject<HTMLElement>, closeModal)
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeModal();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [closeModal]);
 
   useEffect(() => {
     if (!modalRef.current) return;
@@ -72,10 +88,16 @@ export default function AddToCartModal() {
       ref={modalRef}
       className="fixed bottom-0 left-1/2 translate-x-[-50%] w-full max-w-md bg-white rounded-t-2xl p-6 z-1000 will-change-transform will-change-opacity"
     >
+      <div className='flex justify-end -mt-3 -mr-2'>
+        <IconButton size='small' aria-label='Close' onClick={closeModal}>
+          <CloseIcon fontSize='small' sx={{ color: 'black' }} />
+        </IconButton>
+      </div>
+
       <div className='flex justify-between items-center'>
         <div className='flex flex-col gap-[5px]'>
           <p className='h3-bold'>${currentItem.price}</p>
-          <span className='h6-regular'>Discount up to 10%</span>
+          <span className='h6-regular'>{currentItem.name}</span>
         </div>
 
         {typeof currentItem.quantity === 'number' && (

@@ -10,13 +10,6 @@ jest.mock('next/image', () => ({
   ),
 }))
 
-// Mock the Button component
-jest.mock('@/shared/ui/Button', () => ({
-  __esModule: true,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  default: ({ children }: any) => <button>{children}</button>,
-}))
-
 describe('DiscountCard component', () => {
   // Renders the main copy
   test('renders discount text and description', () => {
@@ -27,10 +20,11 @@ describe('DiscountCard component', () => {
     expect(screen.getByText(/Special prices on selected groceries/i)).toBeInTheDocument()
   })
 
-  // Renders the "Explore deals" button
-  test('renders the "Explore deals" button', () => {
+  // The card is a banner, not a control: it must not offer a button that goes nowhere
+  test('renders no call-to-action button', () => {
     render(<DiscountCard />)
-    expect(screen.getByRole('button', { name: /Explore deals/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Explore deals/i)).not.toBeInTheDocument()
   })
 
   // Renders the image with the expected src and alt

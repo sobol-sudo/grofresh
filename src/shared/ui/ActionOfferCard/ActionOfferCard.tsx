@@ -1,9 +1,10 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import Button from "../Button";
 
 interface ActionOfferCardProps {
   text: string;
-  type: 'set-payment' | 'apply-discount';
+  type: 'set-payment';
+  actionLabel?: string;
   onClick?: () => void;
 }
 
@@ -21,35 +22,10 @@ const ACTION_CONFIG: Record<
 
     ),
   },
-  'apply-discount': {
-    buttonLabel: 'Apply',
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3.84595 4.20361H19.2307C19.646 4.20361 20.0445 4.36805 20.3381 4.66162C20.6318 4.95524 20.7971 5.35381 20.7971 5.76904V9.28857C20.3247 9.36349 19.8838 9.58374 19.5413 9.92627C19.1138 10.3539 18.8733 10.9339 18.8733 11.5386C18.8733 12.1432 19.1137 12.7233 19.5413 13.1509C19.8838 13.4934 20.3247 13.7127 20.7971 13.7876V17.3081C20.797 17.7232 20.6316 18.121 20.3381 18.4146C20.0445 18.7082 19.646 18.8735 19.2307 18.8735H3.84595C3.43072 18.8735 3.03214 18.7082 2.73853 18.4146C2.4452 18.121 2.28062 17.7231 2.28052 17.3081V13.7876C2.75266 13.7126 3.19307 13.4932 3.5354 13.1509C3.96301 12.7233 4.20335 12.1433 4.20337 11.5386C4.20337 10.9338 3.963 10.3539 3.5354 9.92627C3.19303 9.5839 2.75273 9.36359 2.28052 9.28857V5.76904C2.28058 5.35381 2.44491 4.95524 2.73853 4.66162C3.03214 4.368 3.43072 4.20367 3.84595 4.20361ZM14.6516 6.47803L6.47778 14.6509L6.22583 14.9038L6.47778 15.1567L7.92017 16.5991L8.1731 16.8511L8.42603 16.5991L16.5989 8.42529L16.8508 8.17334L16.5989 7.92041L15.1565 6.47803L14.9036 6.22607L14.6516 6.47803ZM14.6057 12.5464C14.0596 12.5464 13.5358 12.7638 13.1497 13.1499C12.7636 13.536 12.5471 14.0599 12.5471 14.606C12.5472 15.7454 13.4662 16.6645 14.6057 16.6646C15.1518 16.6646 15.6756 16.4481 16.0618 16.062C16.4479 15.6759 16.6652 15.152 16.6653 14.606C16.6653 13.4664 15.7453 12.5464 14.6057 12.5464ZM8.47095 6.4126C7.92493 6.41266 7.40099 6.62904 7.01489 7.01514C6.62881 7.40128 6.41235 7.92515 6.41235 8.47119C6.41235 9.61067 7.3315 10.5297 8.47095 10.5298C9.01699 10.5298 9.54086 10.3133 9.927 9.92725C10.3132 9.5411 10.5305 9.01729 10.5305 8.47119C10.5305 7.33164 9.6105 6.4126 8.47095 6.4126Z" fill="black" stroke="black" strokeWidth="0.714286" />
-      </svg>
-    ),
-  },
 };
 
-export default function ActionOfferCard({ text, type, onClick }: ActionOfferCardProps) {
-  const [isApplied, setIsApplied] = useState(false);
+export default function ActionOfferCard({ text, type, actionLabel, onClick }: ActionOfferCardProps) {
   const { icon, buttonLabel } = ACTION_CONFIG[type];
-
-  const isDisabled = type === "apply-discount" && isApplied;
-
-  const handleClick = () => {
-    if (type === 'apply-discount') {
-      applyDiscountLogic();
-      return
-    }
-
-    if (onClick) onClick();
-  };
-
-  const applyDiscountLogic = () => {
-    setIsApplied(true)
-  };
-
 
   return (
     <div className="shadow bg-white p-4 rounded-[30px] flex items-center">
@@ -62,19 +38,16 @@ export default function ActionOfferCard({ text, type, onClick }: ActionOfferCard
 
       <Button
         colorType="success"
-        disabled={isDisabled}
         sx={{
           marginLeft: 'auto',
           textTransform: 'none',
           borderRadius: '10px',
         }}
-        onClick={handleClick}
+        onClick={onClick}
       >
-        {isApplied ? "Applied" : buttonLabel}
+        {actionLabel ?? buttonLabel}
       </Button>
     </div>
 
   )
 }
-
-

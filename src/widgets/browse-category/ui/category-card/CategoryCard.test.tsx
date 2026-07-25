@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import CategoryCard from './CategoryCard'
 import { Category } from '../../../browse-category/model/types'
 
@@ -36,6 +36,26 @@ describe('CategoryCard component', () => {
     const card = container.firstChild as HTMLElement
     expect(card).toHaveClass('bg-white')
     expect(card).toHaveClass('hover:bg-flash-white')
-    expect(card).toHaveClass('cursor-pointer')
+  })
+
+  // The clickable styling is backed by a real handler
+  test('reports its id when clicked', () => {
+    const onSelect = jest.fn()
+    render(<CategoryCard category={mockCategory} onSelect={onSelect} />)
+
+    fireEvent.click(screen.getByTestId('category-card'))
+
+    expect(onSelect).toHaveBeenCalledWith(mockCategory.id)
+  })
+
+  // Selection is visible, not just internal state
+  test('shows an active state when selected', () => {
+    const { rerender } = render(<CategoryCard category={mockCategory} />)
+    expect(screen.getByTestId('category-card')).toHaveAttribute('aria-pressed', 'false')
+
+    rerender(<CategoryCard category={mockCategory} isSelected />)
+    const card = screen.getByTestId('category-card')
+    expect(card).toHaveAttribute('aria-pressed', 'true')
+    expect(card).toHaveClass('outline-green-500')
   })
 })

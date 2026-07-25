@@ -21,14 +21,14 @@ Live demo: **[grofresh.vercel.app](https://grofresh.vercel.app)**
 
 ## Features
 
-- **Catalog** — 9 categories in a horizontally scrollable strip and a "Popular now" product grid, backed by 17 mock products.
-- **Search with recent queries** — debounced input, filtering over a recent-searches list, an edit mode for deleting entries, click-outside dismissal, and GSAP enter/exit transitions.
+- **Catalog** — 5 categories in a horizontally scrollable strip and a product grid, backed by 17 mock products. Selecting a category filters the grid and is reflected in the URL (`/?category=3`), so a filtered view survives a reload and can be shared.
+- **Search** — a debounced query filters the product grid by name and composes with the category filter, with an explicit empty state when nothing matches. The input also keeps a recent-searches list with an edit mode for deleting entries, click-outside dismissal, and GSAP enter/exit transitions.
 - **Cart** — add and remove items, per-item quantity increment and decrement (an item is dropped at zero), with counts and totals derived through Redux selectors.
-- **Add-to-cart modal** — opens on product selection with a quantity counter; "Buy now" routes straight to the cart in checkout mode.
-- **Checkout** — entry points for a discount code and payment method, mock saved cards, a last-used card, and an order summary with a fixed service fee folded into the total.
-- **Order confirmation** — a dedicated success screen with a Lottie payment animation and payment details.
+- **Add-to-cart modal** — opens on product selection with a quantity counter; "Buy now" routes straight to the cart in checkout mode. Dismissed by a click outside, the close button or Escape.
+- **Checkout** — a two-step flow ("Proceed to checkout", then "Place order"), an inline picker over the mock saved cards, a last-used card, and an order summary with a fixed service fee folded into the total.
+- **Order confirmation** — placing an order snapshots the cart, empties it and replaces the route, so the purchase cannot be repeated with the Back button. The success screen renders a Lottie animation and a receipt built entirely from that order; opening it without one redirects to the catalog.
 - **Telegram Mini App support** — when the app is opened inside Telegram, the `useTelegram` hook reads the WebApp user and renders their name and avatar in the header, falling back to a guest state everywhere else. WebApp types are declared in `src/types/telegram-webapp.d.ts`.
-- **Route-aware header** — a per-route config decides which controls the header renders: user block, back button, cart icon, notifications.
+- **Route-aware header** — a per-route config decides which controls the header renders: user block, back button with a title, cart icon.
 
 ## Getting started
 
@@ -52,7 +52,7 @@ The dev server runs at `http://localhost:3000`.
 | `npm test` | Run the Jest suite; coverage is collected into `coverage/` |
 | `npm run test:watch` | Run Jest in watch mode |
 
-Tests live next to the code they cover — 24 test files across slices, hooks, UI primitives and widgets. Reducer logic is tested directly, components through React Testing Library.
+Tests live next to the code they cover — 26 test files across slices, hooks, UI primitives and widgets. Reducer logic is tested directly, components through React Testing Library.
 
 ## Project structure
 
@@ -64,7 +64,7 @@ src/
 ├── pages/      Route entries: /, /cart, /checkout-success
 ├── widgets/    Composite page sections: header, cart section, popular now, browse category
 ├── features/   User-facing actions: add to cart, recent search, bottom navigation
-├── entities/   Domain models and their UI: product, cart, payment
+├── entities/   Domain models and their UI: product, cart, payment, order
 └── shared/     Reusable UI kit, hooks, theme and helpers - no domain knowledge
 ```
 
