@@ -5,7 +5,7 @@ import { cartReducer, toggleCartItem, toggleSelectedProduct } from '@/entities/c
 import Product from './Product';
 import { IProduct } from '../../model/types';
 
-// Мокаем компонент next/image, чтобы он не вызывал ошибок при тестировании
+// Mock next/image so it does not blow up in the test environment
 jest.mock('next/image', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require('react');
@@ -29,7 +29,7 @@ const mockProduct: IProduct = {
 
 describe('Product Component', () => {
 
-  // Проверяет, что компонент корректно отображает информацию о товаре
+  // Renders the product details correctly
   test('renders product info correctly', () => {
     const store = configureStore({ reducer: { cart: cartReducer } });
 
@@ -43,12 +43,12 @@ describe('Product Component', () => {
     expect(screen.getByText('1 kg')).toBeInTheDocument();
     expect(screen.getByText('$10')).toBeInTheDocument();
 
-    // Проверяем, что изображение рендерится корректно
+    // The image renders correctly
     const img = screen.getByAltText('Product') as HTMLImageElement;
     expect(img.src).toContain('/images/products/spinach.png');
   });
 
-  // Проверяет, что при клике на кнопку вызывается dispatch с toggleCartItem
+  // Clicking the button dispatches toggleCartItem
   test('dispatches toggleCartItem on button click', () => {
     const store = configureStore({ reducer: { cart: cartReducer } });
     store.dispatch = jest.fn();
@@ -62,11 +62,11 @@ describe('Product Component', () => {
     const button = screen.getByRole('button');
     fireEvent.click(button);
 
-    // Проверяем, что dispatch вызван с правильным экшеном
+    // dispatch was called with the right action
     expect(store.dispatch).toHaveBeenCalledWith(toggleCartItem(mockProduct));
   });
 
-  // Проверяет, что у товара добавляется класс outline, если он выбран
+  // The outline class is applied when the product is selected
   test('applies outline class if product is current', () => {
     const store = configureStore({
       reducer: { cart: cartReducer },
@@ -88,7 +88,7 @@ describe('Product Component', () => {
     expect(wrapper).toHaveClass('outline');
   });
 
-  // Проверяет, что класс outline отсутствует, если товар не выбран
+  // The outline class is absent when the product is not selected
   test('does not apply outline class if product is not current', () => {
     const store = configureStore({ reducer: { cart: cartReducer } });
 
@@ -105,10 +105,10 @@ describe('Product Component', () => {
 });
 
 describe('Product Component — selectProduct', () => {
-  // Проверяет, что при клике на блок продукта диспатчится toggleSelectedProduct
+  // Clicking the product card dispatches toggleSelectedProduct
   test('dispatches toggleSelectedProduct on product click', () => {
     const store = configureStore({ reducer: { cart: cartReducer } });
-    store.dispatch = jest.fn(); // подменяем dispatch для отслеживания вызова
+    store.dispatch = jest.fn(); // stub dispatch so we can assert on it
 
     render(
       <Provider store={store}>
@@ -116,17 +116,17 @@ describe('Product Component — selectProduct', () => {
       </Provider>
     );
 
-    // Имитируем клик на область, вызывающую selectProduct
+    // Simulate a click on the area that triggers selectProduct
     const clickableArea = screen.getByText('Spinach').closest('.touch-manipulation');
     if (!clickableArea) throw new Error('Clickable area not found');
 
     fireEvent.click(clickableArea);
 
-    // Проверяем, что был вызван правильный экшен
+    // The right action was dispatched
     expect(store.dispatch).toHaveBeenCalledWith(toggleSelectedProduct(mockProduct));
   });
 
-  // Проверяет, что при клике вызывается ровно один dispatch (нет двойных вызовов)
+  // A single click dispatches exactly once (no double firing)
   test('calls dispatch only once on click', () => {
     const store = configureStore({ reducer: { cart: cartReducer } });
     store.dispatch = jest.fn();
@@ -147,7 +147,7 @@ describe('Product Component — selectProduct', () => {
 });
 
 describe('Product Component — IconButton variant warning', () => {
-  // Проверяет, что кнопка рендерится с оранжевым цветом, если товар уже в корзине
+  // The button renders in orange when the product is already in the cart
   test('renders IconButton with warning color when product is in cart', () => {
     const preloadedState = {
       cart: {
