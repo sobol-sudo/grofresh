@@ -5,12 +5,12 @@ import { useCartQuantity } from "@/shared/hooks/useCartQuantity/useCartQuantity"
 import { toggleCartItem } from "@/entities/cart/model/cart.slice";
 import { IProduct } from "../../model/types";
 
-// Мокаем useAppDispatch
+// Mock useAppDispatch
 jest.mock("@/app/providers/store-provider/config/hooks", () => ({
   useAppDispatch: jest.fn(),
 }));
 
-// Мокаем useCartQuantity
+// Mock useCartQuantity
 jest.mock("@/shared/hooks/useCartQuantity/useCartQuantity", () => ({
   useCartQuantity: jest.fn(),
 }));
