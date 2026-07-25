@@ -83,7 +83,7 @@ export default function SearchRecently() {
         </div>
       </Input>
 
-      {/* Последние поисковые запросы */}
+      {/* Recent searches */}
       {focused && visibleRecent.length > 0 && (
         <ul ref={listRef} className="absolute w-full flex flex-col bg-white p-3 rounded-xl shadow-md mt-2">
           <div className="flex justify-between items-center mb-2">
