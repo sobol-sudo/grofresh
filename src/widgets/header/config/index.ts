@@ -3,6 +3,18 @@ export const headerConfig = {
     user: true,
     cartIcon: true,
   },
+  '/categories': {
+    backRoute: true,
+    centerName: true,
+    title: 'Categories',
+    cartIcon: true,
+  },
+  '/products': {
+    backRoute: true,
+    centerName: true,
+    title: 'All products',
+    cartIcon: true,
+  },
   '/cart': {
     backRoute: true,
     centerName: true,

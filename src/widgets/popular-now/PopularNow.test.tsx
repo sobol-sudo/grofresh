@@ -20,12 +20,15 @@ jest.mock('@/entities/product/config/mock', () => ({
 }));
 
 describe('PopularNow component', () => {
-  // Renders the heading; the "more" link pointed at a screen that does not exist
-  test('renders heading and no "more" link', () => {
+  // This catalog is shorter than the teaser limit, so the teaser is already showing all
+  // of it and there is nothing for "See all" to open. See PopularNow.teaser.test.tsx
+  // for the case where the catalog is longer.
+  test('renders the heading and offers no "See all" when nothing is held back', () => {
     render(<PopularNow />);
 
     expect(screen.getByText('Popular now')).toBeInTheDocument();
-    expect(screen.queryByText('more')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('product-item')).toHaveLength(4);
+    expect(screen.queryByRole('link', { name: 'See all products' })).not.toBeInTheDocument();
   });
 
   // Renders every product from MOCK_PRODUCTS

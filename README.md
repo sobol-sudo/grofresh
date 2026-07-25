@@ -22,6 +22,7 @@ Live demo: **[grofresh.vercel.app](https://grofresh.vercel.app)**
 ## Features
 
 - **Catalog** — 5 categories in a horizontally scrollable strip and a product grid, backed by 17 mock products. Selecting a category filters the grid and is reflected in the URL (`/?category=3`), so a filtered view survives a reload and can be shared.
+- **Browse screens** — the home page is a teaser: it shows the first 8 products, and "See all" opens `/products` with the whole catalog. A second "See all" opens `/categories`, which lays out every category with the number of products it holds and taps through into the same `?category=` filter. Both links are rendered only when there is something behind them, and both screens have their own empty state.
 - **Search** — a debounced query filters the product grid by name and composes with the category filter, with an explicit empty state when nothing matches. The input also keeps a recent-searches list with an edit mode for deleting entries, click-outside dismissal, and GSAP enter/exit transitions.
 - **Cart** — add and remove items, per-item quantity increment and decrement (an item is dropped at zero), with counts and totals derived through Redux selectors.
 - **Add-to-cart modal** — opens on product selection with a quantity counter; "Buy now" routes straight to the cart in checkout mode. Dismissed by a click outside, the close button or Escape.
@@ -61,8 +62,8 @@ The codebase follows [Feature-Sliced Design](https://feature-sliced.design/). La
 ```
 src/
 ├── app/        Providers and global styles - Redux store provider, MUI theme, CSS layers
-├── pages/      Route entries: /, /cart, /checkout-success
-├── widgets/    Composite page sections: header, cart section, popular now, browse category
+├── pages/      Route entries: /, /categories, /products, /cart, /checkout-success
+├── widgets/    Composite page sections: header, cart section, popular now, browse category, product catalog
 ├── features/   User-facing actions: add to cart, recent search, bottom navigation
 ├── entities/   Domain models and their UI: product, cart, payment, order
 └── shared/     Reusable UI kit, hooks, theme and helpers - no domain knowledge

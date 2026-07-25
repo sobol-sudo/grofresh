@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import BrowseCategory from './BrowseCategory'
-import { MOCK_CATEGORIES } from './config/mock'
+import type { Category } from './model/types'
 
 // Mock CategoryCard so real images and styles are not rendered
 jest.mock('./ui/category-card', () => ({
@@ -20,17 +20,34 @@ jest.mock('./ui/category-card', () => ({
   ),
 }))
 
+// Swapped per test through a getter so the empty strip can be reached; every test
+// other than that one runs against the real category list.
+let mockCategories: Category[] = []
+jest.mock('./config/mock', () => ({
+  get MOCK_CATEGORIES() {
+    return mockCategories
+  },
+}))
+
+const MOCK_CATEGORIES: Category[] = jest.requireActual('./config/mock').MOCK_CATEGORIES
+
 describe('BrowseCategory component', () => {
+  beforeEach(() => {
+    mockCategories = MOCK_CATEGORIES
+  })
+
   // Renders the section heading
   test('renders section title', () => {
     render(<BrowseCategory />)
     expect(screen.getByText('Browse categories')).toBeInTheDocument()
   })
 
-  // The "more" link pointed at a screen that does not exist
-  test('renders no "more" link', () => {
+  // The strip runs off the edge of a phone; "See all" opens the full grid
+  test('links to the full category screen', () => {
     render(<BrowseCategory />)
-    expect(screen.queryByText('more')).not.toBeInTheDocument()
+
+    const link = screen.getByRole('link', { name: 'See all categories' })
+    expect(link).toHaveAttribute('href', '/categories')
   })
 
   // Every listed category maps to products
@@ -74,6 +91,16 @@ describe('BrowseCategory component', () => {
     MOCK_CATEGORIES.forEach((category) => {
       expect(screen.getByText(category.name)).toBeInTheDocument()
     })
+  })
+
+  // Nothing to browse means nothing to open: the link goes with the list
+  test('drops the link and explains itself when there are no categories', () => {
+    mockCategories = []
+    render(<BrowseCategory />)
+
+    expect(screen.queryByRole('link', { name: 'See all categories' })).not.toBeInTheDocument()
+    expect(screen.queryAllByTestId('category-card')).toHaveLength(0)
+    expect(screen.getByTestId('no-categories')).toHaveTextContent('No categories to browse yet')
   })
 
   // A custom className is applied to the root container

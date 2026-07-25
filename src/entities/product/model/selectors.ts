@@ -24,3 +24,18 @@ export function selectMaxDiscountPercent(products: IProduct[] = MOCK_PRODUCTS): 
     0
   );
 }
+
+/**
+ * How many products a category actually holds.
+ *
+ * The category screen prints this next to every card, and tapping the card opens
+ * `/?category=<id>`, which filters the same list by the same field. The number and
+ * the screen it leads to are therefore derived from one source and cannot drift:
+ * a category with nothing in it reads "0 products" rather than being hidden.
+ */
+export function selectProductCountByCategory(
+  categoryId: number,
+  products: IProduct[] = MOCK_PRODUCTS
+): number {
+  return products.filter((product) => product.category_id === categoryId).length;
+}
