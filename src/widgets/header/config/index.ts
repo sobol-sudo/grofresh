@@ -16,6 +16,12 @@ export const headerConfig = {
     title: 'All products',
     cartIcon: true,
   },
+  '/deals': {
+    backRoute: true,
+    centerName: true,
+    title: 'Fresh Deals',
+    cartIcon: true,
+  },
   '/cart': {
     backRoute: true,
     centerName: true,

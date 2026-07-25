@@ -4,10 +4,18 @@ import CheckIcon from '@mui/icons-material/Check';
 interface CheckboxProps {
   sx?: SxProps<Theme>;
   checked: boolean;
-  onClick?: () => void
+  onClick?: () => void;
+  /**
+   * Report a state the user cannot change from here.
+   *
+   * Without this a read-only row still renders a real checkbox: focusable, clickable
+   * and completely inert. Disabling it is the honest version — the state is still
+   * announced, but nothing offers an interaction that goes nowhere.
+   */
+  disabled?: boolean;
 }
 
-export default function Checkbox({ sx, checked, onClick }: CheckboxProps) {
+export default function Checkbox({ sx, checked, onClick, disabled = false }: CheckboxProps) {
   const defaultSx: SxProps<Theme> = {
     padding: 0,
     ...sx,
@@ -18,6 +26,7 @@ export default function Checkbox({ sx, checked, onClick }: CheckboxProps) {
       sx={defaultSx}
       disableRipple
       checked={checked}
+      disabled={disabled}
       icon={
         <span
           style={{

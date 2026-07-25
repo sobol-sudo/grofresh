@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { IProduct } from "../../model/types";
+import { discountedPrice, formatPrice, hasDiscount } from "../../lib/price";
 import IconButton from "@/shared/ui/IconButton";
 import { useAppDispatch, useAppSelector } from "@/app/providers/store-provider/config/hooks";
 import { toggleCartItem, isInCart, selectedProduct, toggleSelectedProduct } from "@/entities/cart/model/cart.slice";
@@ -25,14 +26,26 @@ export default function Product({ product }: ProductProps) {
 
   const isCurrent = () => product.id === currentItem?.id
 
+  const isOnOffer = hasDiscount(product);
+
   return (
     <div data-testid="product-wrapper" className={`shadow bg-white flex-1 min-w-[150px] max-w-[180px] p-2.5 flex flex-col gap-2.5 rounded-[30px] ${isCurrent() ? 'outline outline-green-500 ' : ''}`}>
-      <div className="shadow bg-white rounded-[20px] flex justify-center">
+      <div className="shadow bg-white rounded-[20px] flex justify-center relative">
         <Image
           src={product.src}
           width={100}
           height={100}
           alt="Product" />
+
+        {/* The number comes off the product itself, so a badge cannot outlive its promotion. */}
+        {isOnOffer && (
+          <span
+            className="absolute left-2 top-2 rounded-full bg-[var(--color-green-500)] text-white xtra-small-bold px-2 py-[3px]"
+            data-testid="product-discount-badge"
+          >
+            -{product.discountPercent}%
+          </span>
+        )}
       </div>
       <div className="touch-manipulation" onClick={selectProduct}>
         <div className="flex flex-col gap-[5px]">
@@ -40,7 +53,15 @@ export default function Product({ product }: ProductProps) {
           <span className="h6-regular">{product.unitValue} {product.unit}</span>
         </div>
         <div className="flex justify-between items-center mt-[7px]">
-          <b className="medium-bold">${product.price}</b>
+          <span className="flex items-baseline gap-[5px]">
+            <b className="medium-bold" data-testid="product-price">${formatPrice(discountedPrice(product))}</b>
+
+            {isOnOffer && (
+              <s className="xtra-small-regular text-gray-500" data-testid="product-list-price">
+                ${formatPrice(product.price)}
+              </s>
+            )}
+          </span>
           <IconButton variant={isCart ? 'warning' : 'success'} size="medium" onClick={(e) => toggleProductInCart(e)} >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M6.05786 10.5986C6.4174 10.5986 6.70915 10.8905 6.70923 11.25C6.70923 11.6096 6.41745 11.9014 6.05786 11.9014C5.69834 11.9013 5.40649 11.6095 5.40649 11.25C5.40658 10.8905 5.69839 10.5987 6.05786 10.5986Z" fill="white" stroke="white" strokeWidth="0.428571" />

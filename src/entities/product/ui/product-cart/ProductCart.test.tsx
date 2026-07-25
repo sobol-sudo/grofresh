@@ -44,7 +44,7 @@ describe("ProductCart component", () => {
     
     expect(screen.getByText("Apple")).toBeInTheDocument();
     expect(screen.getByText("1 kg")).toBeInTheDocument();
-    expect(screen.getByText("$10")).toBeInTheDocument();
+    expect(screen.getByText("$10.00")).toBeInTheDocument();
     
     expect(screen.getByTestId("btn-increment")).toBeInTheDocument();
     expect(screen.getByTestId("btn-decrease")).toBeInTheDocument();

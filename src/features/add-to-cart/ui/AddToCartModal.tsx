@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/app/providers/store-provider/config/hooks'
 import { clearLastProduct } from '@/entities/cart/model/cart.slice';
+import { discountedPrice, formatPrice, hasDiscount } from '@/entities/product';
 import { useCartQuantity } from '@/shared/hooks/useCartQuantity/useCartQuantity';
 import { useClickOutside } from '@/shared/hooks/useClickOutside/useClickOutside';
 import Button from '@/shared/ui/Button';
@@ -96,7 +97,15 @@ export default function AddToCartModal() {
 
       <div className='flex justify-between items-center'>
         <div className='flex flex-col gap-[5px]'>
-          <p className='h3-bold'>${currentItem.price}</p>
+          <span className='flex items-baseline gap-2'>
+            <p className='h3-bold'>${formatPrice(discountedPrice(currentItem))}</p>
+
+            {hasDiscount(currentItem) && (
+              <s className='h6-regular text-gray-500' data-testid='modal-list-price'>
+                ${formatPrice(currentItem.price)}
+              </s>
+            )}
+          </span>
           <span className='h6-regular'>{currentItem.name}</span>
         </div>
 

@@ -41,7 +41,9 @@ describe('Product Component', () => {
 
     expect(screen.getByText('Spinach')).toBeInTheDocument();
     expect(screen.getByText('1 kg')).toBeInTheDocument();
-    expect(screen.getByText('$10')).toBeInTheDocument();
+    // Money is always rendered to two decimals so a price and a struck-through
+    // list price cannot line up as "$2" against "$2.5".
+    expect(screen.getByText('$10.00')).toBeInTheDocument();
 
     // The image renders correctly
     const img = screen.getByAltText('Product') as HTMLImageElement;
@@ -143,6 +145,61 @@ describe('Product Component — selectProduct', () => {
     fireEvent.click(clickableArea);
 
     expect(store.dispatch).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Product Component — promoted pricing', () => {
+  const renderProduct = (product: IProduct) =>
+    render(
+      <Provider store={configureStore({ reducer: { cart: cartReducer } })}>
+        <Product product={product} />
+      </Provider>
+    );
+
+  const onOffer: IProduct = { ...mockProduct, price: 2.5, discountPercent: 20 };
+
+  /*
+    The home banner advertises a percentage off. Until this rendered, the discount
+    existed only in the data: every card showed the list price and the cart charged
+    it, so the sale was a claim with nothing behind it.
+  */
+  test('shows the discounted price as the price', () => {
+    renderProduct(onOffer);
+
+    expect(screen.getByTestId('product-price')).toHaveTextContent('$2.00');
+  });
+
+  // The saving is only legible next to what the product used to cost
+  test('shows the list price struck through', () => {
+    renderProduct(onOffer);
+
+    const listPrice = screen.getByTestId('product-list-price');
+    expect(listPrice).toHaveTextContent('$2.50');
+    expect(listPrice.tagName).toBe('S');
+  });
+
+  // The badge reads off the product, so it cannot outlive the promotion
+  test('badges the percentage the product actually carries', () => {
+    renderProduct({ ...mockProduct, price: 10, discountPercent: 35 });
+
+    expect(screen.getByTestId('product-discount-badge')).toHaveTextContent('-35%');
+  });
+
+  // A full-price product must not grow a struck-through price or a badge
+  test('shows no discount furniture on a full-price product', () => {
+    renderProduct(mockProduct);
+
+    expect(screen.getByTestId('product-price')).toHaveTextContent('$10.00');
+    expect(screen.queryByTestId('product-list-price')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('product-discount-badge')).not.toBeInTheDocument();
+  });
+
+  // Zero is not a promotion
+  test('treats a zero discount as full price', () => {
+    renderProduct({ ...mockProduct, price: 10, discountPercent: 0 });
+
+    expect(screen.getByTestId('product-price')).toHaveTextContent('$10.00');
+    expect(screen.queryByTestId('product-discount-badge')).not.toBeInTheDocument();
   });
 });
 

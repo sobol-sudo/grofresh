@@ -23,6 +23,7 @@ Live demo: **[grofresh.vercel.app](https://grofresh.vercel.app)**
 
 - **Catalog** — 5 categories in a horizontally scrollable strip and a product grid, backed by 17 mock products. Selecting a category filters the grid and is reflected in the URL (`/?category=3`), so a filtered view survives a reload and can be shared.
 - **Browse screens** — the home page is a teaser: it shows the first 8 products, and "See all" opens `/products` with the whole catalog. A second "See all" opens `/categories`, which lays out every category with the number of products it holds and taps through into the same `?category=` filter. Both links are rendered only when there is something behind them, and both screens have their own empty state.
+- **Deals** — the seven fresh-produce items carry a 20% discount. The home banner reads both the size of the sale and the number of products in it off the catalog instead of hardcoding them, and "Explore deals" opens `/deals` with exactly those products. One function turns a discount into money, so the price on the card, the price struck through beside it and the price the cart charges cannot disagree. With nothing on offer the banner does not render and the screen explains itself rather than showing an empty grid.
 - **Search** — a debounced query filters the product grid by name and composes with the category filter, with an explicit empty state when nothing matches. The input also keeps a recent-searches list with an edit mode for deleting entries, click-outside dismissal, and GSAP enter/exit transitions.
 - **Cart** — add and remove items, per-item quantity increment and decrement (an item is dropped at zero), with counts and totals derived through Redux selectors. An overflow menu in the header empties the whole cart behind a confirmation step, and removes itself when there is nothing left to clear.
 - **Add-to-cart modal** — opens on product selection with a quantity counter; "Buy now" routes straight to the cart in checkout mode. Dismissed by a click outside, the close button or Escape.
@@ -31,7 +32,8 @@ Live demo: **[grofresh.vercel.app](https://grofresh.vercel.app)**
 - **Notifications** — placing an order is the only thing that produces one, so the header bell's badge counts real unread entries and is absent entirely at zero. `/notifications` lists them newest first, keeps the "new" markers of whatever was waiting when you arrived, and has its own empty state.
 - **Profile** — `/profile` shows the Telegram identity alongside numbers counted out of the stored history: orders placed, notifications, and a summary of the most recent order. Every figure waits for storage to be read rather than flashing a zero.
 - **Telegram Mini App support** — when the app is opened inside Telegram, the `useTelegram` hook reads the WebApp user and renders their name and avatar in the header and on the profile, falling back to an explicit guest state everywhere else. WebApp types are declared in `src/types/telegram-webapp.d.ts`.
-- **App shell** — a per-route config decides which controls the header renders: user block, back button with a title, cart icon, notification bell, cart overflow menu. The tab bar sits on the home, cart, notifications and profile screens, and its active tab is read from the route rather than from local state.
+- **App shell** — a per-route config decides which controls the header renders: user block, back button with a title, cart icon, notification bell, cart overflow menu. Every route has an entry, so no screen arrives without a title and a way back. The tab bar sits on the home, cart, notifications, profile and not-found screens, and its active tab is read from the route rather than from local state.
+- **Not found** — an unknown URL matches no header entry, which would otherwise leave the framework default sitting under an empty header with no way out. `/404` is written by hand instead: it says what happened and offers the catalog and the tab bar.
 
 ## Getting started
 
@@ -55,7 +57,9 @@ The dev server runs at `http://localhost:3000`.
 | `npm test` | Run the Jest suite; coverage is collected into `coverage/` |
 | `npm run test:watch` | Run Jest in watch mode |
 
-Tests live next to the code they cover — 48 test files across slices, hooks, UI primitives and widgets. Reducer logic is tested directly, components through React Testing Library.
+Tests live next to the code they cover — 52 test files across slices, hooks, UI primitives and widgets. Reducer logic is tested directly, components through React Testing Library. Route-level tests sit in `src/__tests__`, outside `src/pages`, because anything under `pages/` is treated as a route.
+
+A recurring theme in the suite is that a control has to lead somewhere and a number has to be counted rather than typed. Those are asserted, not assumed: the deals banner is rendered against catalogs it does not have to prove its headline follows the data, the "See all" links are only offered when something is genuinely held back, and the cart total is checked against the price shown on the card.
 
 ## Project structure
 
@@ -64,8 +68,8 @@ The codebase follows [Feature-Sliced Design](https://feature-sliced.design/). La
 ```
 src/
 ├── app/        Providers and global styles - Redux store provider, MUI theme, CSS layers
-├── pages/      Route entries: /, /categories, /products, /cart, /checkout-success, /notifications, /profile
-├── widgets/    Composite page sections: header, cart section, popular now, browse category, product catalog, notification list, profile section
+├── pages/      Route entries: /, /categories, /products, /deals, /cart, /checkout-success, /notifications, /profile, /404
+├── widgets/    Composite page sections: header, cart section, popular now, browse category, product catalog, deals section, discount card, notification list, profile section
 ├── features/   User-facing actions: add to cart, recent search, bottom navigation, cart menu
 ├── entities/   Domain models and their UI: product, cart, payment, order, notification
 └── shared/     Reusable UI kit, hooks, theme and helpers - no domain knowledge

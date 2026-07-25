@@ -264,4 +264,61 @@ describe('cartSlice selectors', () => {
 
     expect(allPriceCart(state2)).toBe('7.55')
   })
+
+  /*
+    The catalog advertises a promotion and the product card shows the reduced price.
+    A total summed from list prices would show the customer one number and charge
+    another, so the total goes through the same `discountedPrice` the card does.
+  */
+  test('allPriceCart charges the discounted price, not the list price', () => {
+    const state = {
+      cart: {
+        items: [{ ...mockProduct, price: 2.5, discountPercent: 20, quantity: 1 }],
+        selectedProduct: null
+      }
+    };
+
+    expect(allPriceCart(state)).toBe('2.00')
+  })
+
+  // The discount applies to every unit, not just the first
+  test('allPriceCart applies the discount across the quantity', () => {
+    const state = {
+      cart: {
+        items: [{ ...mockProduct, price: 2.2, discountPercent: 20, quantity: 3 }],
+        selectedProduct: null
+      }
+    };
+
+    // 2.20 - 20% = 1.76 a unit
+    expect(allPriceCart(state)).toBe('5.28')
+  })
+
+  // A cart mixing promoted and full-price goods totals each on its own terms
+  test('allPriceCart mixes discounted and undiscounted items correctly', () => {
+    const state = {
+      cart: {
+        items: [
+          { ...mockProduct, price: 2.5, discountPercent: 20, quantity: 2 },
+          { ...anotherProduct, price: 3, quantity: 1 }
+        ],
+        selectedProduct: null
+      }
+    };
+
+    // (2.00 x 2) + 3.00
+    expect(allPriceCart(state)).toBe('7.00')
+  })
+
+  // A zero percent is not a discount, and must not be treated as one
+  test('allPriceCart ignores a zero discount', () => {
+    const state = {
+      cart: {
+        items: [{ ...mockProduct, price: 4.4, discountPercent: 0, quantity: 1 }],
+        selectedProduct: null
+      }
+    };
+
+    expect(allPriceCart(state)).toBe('4.40')
+  })
 });

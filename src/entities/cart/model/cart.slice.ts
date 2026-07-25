@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IProduct } from '@/entities/product'
+import { IProduct, discountedPrice } from '@/entities/product'
 
 export interface ProductState {
   items: IProduct[],
@@ -93,4 +93,11 @@ export const selectedProduct = (state: { cart: ProductState }) => state.cart.sel
 export const selectedCartItems = (state: { cart: ProductState }) => state.cart.items
 export const selectedCartCount = (state: { cart: ProductState }) => state.cart.items.length
 export const isInCart = (state: { cart: ProductState }, product: IProduct): boolean => state.cart.items.some(el => el.id === product.id)
-export const allPriceCart = (state: { cart: ProductState }) => state.cart.items.reduce((acc, el) => acc += el.price * el.quantity, 0).toFixed(2)
+/**
+ * What the cart costs, before the service fee.
+ *
+ * This goes through `discountedPrice` for the same reason the product card does: the
+ * catalog advertises a promotion, and a total built from list prices would quietly
+ * charge for a discount the customer was shown.
+ */
+export const allPriceCart = (state: { cart: ProductState }) => state.cart.items.reduce((acc, el) => acc += discountedPrice(el) * el.quantity, 0).toFixed(2)

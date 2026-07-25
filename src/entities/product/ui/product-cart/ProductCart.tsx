@@ -1,6 +1,7 @@
 import Counter from "@/shared/ui/Counter";
 import Image from "next/image";
 import { IProduct } from "../../model/types";
+import { discountedPrice, formatPrice, hasDiscount } from "../../lib/price";
 import { useCartQuantity } from "@/shared/hooks/useCartQuantity/useCartQuantity";
 import { useAppDispatch } from "@/app/providers/store-provider/config/hooks";
 import { toggleCartItem } from "@/entities/cart/model/cart.slice";
@@ -42,7 +43,15 @@ export default function ProductCart({ product }: ProductCartProps) {
         </div>
 
         <div className="flex justify-between items-center">
-          <span className="h5-bold">${product.price}</span>
+          <span className="flex items-baseline gap-[5px]">
+            <span className="h5-bold" data-testid="cart-item-price">${formatPrice(discountedPrice(product))}</span>
+
+            {hasDiscount(product) && (
+              <s className="h6-regular text-gray-500" data-testid="cart-item-list-price">
+                ${formatPrice(product.price)}
+              </s>
+            )}
+          </span>
 
           <Counter quantity={product.quantity} btnSize="small" handleChange={(type) => handleQuantityChange(product, type)} />
         </div>

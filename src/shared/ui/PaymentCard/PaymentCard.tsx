@@ -12,6 +12,12 @@ export default function PaymentCard({ card, isLastCard }: PaymentCardProps) {
   const selectedCard = useAppSelector((state) => state.payment.currentCard);
   const dispatch = useAppDispatch()
 
+  /**
+   * The "Last use" row is a record of what was used before, not a third place to pick
+   * a card — the picker above it is the one control that changes the payment method.
+   * It is therefore rendered without a click handler and with its checkbox disabled,
+   * rather than looking tappable and swallowing the tap.
+   */
   const toggleCard = () => {
     if (!card || isLastCard) return
 
@@ -35,7 +41,7 @@ export default function PaymentCard({ card, isLastCard }: PaymentCardProps) {
 
       <span className="small-regular ml-2.5">{card.name}</span>
 
-      <Checkbox sx={{ marginLeft: 'auto' }} checked={isSelected} />
+      <Checkbox sx={{ marginLeft: 'auto' }} checked={isSelected} disabled={isLastCard} />
     </div>
   )
 }

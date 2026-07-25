@@ -63,8 +63,33 @@ describe("PaymentCard component", () => {
     (hooks.useAppSelector as jest.Mock).mockReturnValue(card);
 
     render(<PaymentCard card={card} />);
-    
+
     const checkbox = screen.getByRole("checkbox");
     expect(checkbox).toBeChecked();
+  });
+
+  /*
+    "Last use" is a record of the card used before, not a third way to choose one —
+    the picker above it owns that. It used to render a live checkbox anyway: focusable,
+    clickable, and wired to a handler that returned immediately. Disabling it keeps the
+    state readable without offering an interaction that does nothing.
+  */
+  it("renders the last-used card's checkbox as a disabled indicator", () => {
+    (hooks.useAppSelector as jest.Mock).mockReturnValue(card);
+
+    render(<PaymentCard card={card} isLastCard />);
+
+    const checkbox = screen.getByRole("checkbox");
+    expect(checkbox).toBeDisabled();
+    expect(checkbox).toBeChecked();
+  });
+
+  // The selectable card keeps its working control
+  it("leaves the selectable card's checkbox operable", () => {
+    (hooks.useAppSelector as jest.Mock).mockReturnValue(card);
+
+    render(<PaymentCard card={card} />);
+
+    expect(screen.getByRole("checkbox")).toBeEnabled();
   });
 });

@@ -23,3 +23,14 @@ export function discountedPrice(product: IProduct): number {
 export function discountSavings(product: IProduct): number {
   return Math.round((product.price - discountedPrice(product)) * 100) / 100;
 }
+
+/**
+ * Money as the customer reads it: always two decimals.
+ *
+ * A discounted product shows what it costs next to what it used to cost, and the raw
+ * numbers do not line up — 20% off 2.5 is exactly 2, so an unformatted pair renders as
+ * "$2 / $2.5" and reads like a bug rather than a saving.
+ */
+export function formatPrice(amount: number): string {
+  return amount.toFixed(2);
+}
