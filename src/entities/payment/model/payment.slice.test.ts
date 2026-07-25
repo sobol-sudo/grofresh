@@ -15,20 +15,20 @@ describe("paymentSlice reducer", () => {
     };
   });
 
-  // Проверяем, что редьюсер возвращает начальное состояние
+  // The reducer returns the initial state
   it("should return the initial state", () => {
     const state = paymentReducer(undefined, { type: "unknown" });
     expect(state).toEqual(initialState);
   });
 
-  // Проверяем, что currentCard сбрасывается, если выбран текущий
+  // currentCard is cleared when the currently selected card is toggled
   it("should toggle current card off if selected card is the current one", () => {
     const action = toggleCurrentCard({ id: 1, name: 'Mastercard', src: '' });
     const state = paymentReducer(initialState, action);
     expect(state.currentCard).toBeNull();
   });
 
-  // Проверяем, что currentCard устанавливается на другую карту
+  // currentCard switches to a different card
   it("should set current card if different card is selected", () => {
     const action = toggleCurrentCard({ id: 2, name: 'Visa', src: '' });
     const state = paymentReducer(initialState, action);
@@ -36,7 +36,7 @@ describe("paymentSlice reducer", () => {
     expect(state.currentCard?.name).toBe('Visa');
   });
 
-  // Проверяем, что currentCard не изменяется, если lastUsedCard выбран и карта одна
+  // currentCard is unchanged when lastUsedCard is selected and it is the only card
   it("should not change currentCard if lastUsedCard is selected and only one card exists", () => {
     const singleCardState: PaymentState = {
       ...initialState,
@@ -48,7 +48,7 @@ describe("paymentSlice reducer", () => {
     expect(state.currentCard?.id).toBe(1);
   });
 
-  // Проверяем, что currentCard не меняется, если передан неизвестный id
+  // currentCard is unchanged when an unknown id is passed
   it("should not set currentCard if card id not found", () => {
     const action = toggleCurrentCard({ id: 999, name: 'Unknown', src: '' });
     const state = paymentReducer(initialState, action);
@@ -56,29 +56,29 @@ describe("paymentSlice reducer", () => {
   });
 
 
-  // Проверяем случай, когда lastUsedCard = null
+  // Case: lastUsedCard is null
   it('should handle case when lastUsedCard is null', () => {
     const stateWithNoLastUsed = { ...initialState, lastUsedCard: null };
     const action = toggleCurrentCard({ id: 1, name: 'Mastercard', src: '' });
     const newState = paymentReducer(stateWithNoLastUsed, action);
 
-    // currentCard должно стать null
+    // currentCard should become null
     expect(newState.currentCard).toBeNull();
   });
   
-  // Проверяем случай, когда currentCard = null
+  // Case: currentCard is null
   it('should handle case when CurrentCard is null', () => {
     const stateCurrentCard = { ...initialState, currentCard: null };
     const action = toggleCurrentCard({ id: 1, name: 'Mastercard', src: '' });
     const newState = paymentReducer(stateCurrentCard, action);
 
-    // currentCard не должно остаться null
+    // currentCard should not stay null
     expect(newState.currentCard).not.toBeNull();
   });
 });
 
 
-// Тесты селекторов
+// Selector tests
 
 describe('paymentSlice selectors', () => {
   let state: { payment: PaymentState };
@@ -97,31 +97,31 @@ describe('paymentSlice selectors', () => {
     };
   });
 
-  // Проверяем селектор serviceFee
+  // serviceFee selector
   it('serviceFee selector should return correct value', () => {
     expect(serviceFee(state)).toBe('1.50');
   });
 
-  // Проверяем селектор currentCard
+  // currentCard selector
   it('currentCard selector should return the current card', () => {
     expect(currentCard(state)).toEqual(state.payment.currentCard);
   });
 
-  // Проверяем селектор allCards
+  // allCards selector
   it('allCards selector should return all cards', () => {
     expect(allCards(state)).toEqual(state.payment.cards);
   });
 
-  // Проверяем селектор lastUsedCard
+  // lastUsedCard selector
   it('lastUsedCard selector should return the last used card', () => {
     expect(lastUsedCard(state)).toEqual(state.payment.lastUsedCard);
   });
 
-  // Проверяем селектор paymentMethod
+  // paymentMethod selector
   it('paymentMethod selector should return current card name', () => {
     expect(paymentMethod(state)).toBe('Mastercard');
 
-    // если currentCard = null
+    // when currentCard is null
     state.payment.currentCard = null;
     expect(paymentMethod(state)).toBeUndefined();
   });
