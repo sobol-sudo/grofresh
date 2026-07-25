@@ -1,6 +1,8 @@
 import Avatar from '@/shared/ui/Avatar/Avatar'
 import IconButton from '@/shared/ui/IconButton'
 import CartIcon from '@/entities/cart/ui/CartIcon';
+import NotificationBell from '@/entities/notification/ui/NotificationBell';
+import { CartMenu } from '@/features/cart-menu';
 import { usePathname } from 'next/navigation';
 import { HeaderConfig, headerConfig, HeaderRoute } from './config';
 import { useRouter } from 'next/router'
@@ -49,6 +51,11 @@ export default function Header() {
       <div className='flex items-center gap-1.5'>
         {currentConfig?.cartIcon && <CartIcon onClick={() => router.push('/cart')} />}
 
+        {currentConfig?.notificationIcon && (
+          <NotificationBell onClick={() => router.push('/notifications')} />
+        )}
+
+        {currentConfig?.dots && <CartMenu />}
       </div>
 
 

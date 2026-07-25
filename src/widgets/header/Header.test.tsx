@@ -5,9 +5,11 @@ import { useRouter } from 'next/router';
 import { usePathname } from 'next/navigation';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { cartReducer } from '@/entities/cart/model/cart.slice';
+import { rootReducer } from '@/app/providers/store-provider/config/rootReducer';
 import { HeaderConfig, headerConfig, HeaderRoute } from './config';
 import { useTelegram } from '@/shared/hooks/useTelegram/useTelegram';
+import { IProduct } from '@/entities/product';
+import type { AppNotification } from '@/entities/notification';
 
 // --- Mocks for next/router and next/navigation ---
 jest.mock('next/router', () => ({
@@ -37,12 +39,43 @@ jest.mock('@/entities/cart/ui/CartIcon', () => (props: any) => (
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('@/shared/ui/IconButton', () => (props: any) => <button {...props} />);
-// --- Minimal mock store for CartIcon ---
-const createStore = () =>
+
+// The bell and the overflow menu are deliberately NOT mocked: what they show is the
+// point of them, and a stand-in would render whatever it was told to.
+
+const product = (id: number, quantity: number): IProduct => ({
+  id,
+  src: `/images/products/${id}.png`,
+  name: `Product ${id}`,
+  unitValue: 1,
+  unit: 'kg',
+  price: 2.2,
+  category: 'Fruits',
+  category_id: 1,
+  quantity,
+});
+
+const notification = (id: string, read: boolean): AppNotification => ({
+  id,
+  kind: 'order-placed',
+  title: 'Order placed',
+  message: 'An order was placed.',
+  createdAt: '25 July, 03:45 PM',
+  read,
+  orderCode: id,
+});
+
+interface HeaderStoreOptions {
+  cartItems?: IProduct[];
+  notifications?: AppNotification[];
+}
+
+const createStore = ({ cartItems = [], notifications = [] }: HeaderStoreOptions = {}) =>
   configureStore({
-    reducer: { cart: cartReducer },
+    reducer: rootReducer,
     preloadedState: {
-      cart: { items: [], selectedProduct: null, },
+      cart: { items: cartItems, selectedProduct: null },
+      notification: { items: notifications, isHydrated: true },
     },
   });
 
@@ -59,10 +92,10 @@ describe('Header component', () => {
     });
   });
 
-  const renderHeader = (path: string) => {
+  const renderHeader = (path: string, options: HeaderStoreOptions = {}) => {
     (usePathname as jest.Mock).mockReturnValue(path);
     return render(
-      <Provider store={createStore()}>
+      <Provider store={createStore(options)}>
         <Header />
       </Provider>
     );
@@ -71,7 +104,8 @@ describe('Header component', () => {
   // Tests generated dynamically from the config
   (Object.keys(headerConfig) as HeaderRoute[]).forEach((route) => {
     test(`renders correct elements for route ${route}`, () => {
-      renderHeader(route);
+      // A stocked cart, so a route configured for the overflow menu actually gets one.
+      renderHeader(route, { cartItems: [product(1, 1)] });
       const config = headerConfig[route] as HeaderConfig;
 
       if (config?.user) expect(screen.getByTestId('user')).toBeInTheDocument();
@@ -81,15 +115,33 @@ describe('Header component', () => {
       }
       if (config?.cartIcon) expect(screen.getByTestId('cart-icon')).toBeInTheDocument();
 
-      // Notifications and the overflow menu were removed: no route may bring them back.
-      expect(screen.queryByTestId('notification-icon')).toBeNull();
-      expect(screen.queryByTestId('dots')).toBeNull();
+      // The bell and the overflow menu appear where the config puts them and nowhere
+      // else — every route used to be checked for their absence, because both were
+      // dead. They are back, so the check is now that each is where it says it is.
+      if (config?.notificationIcon) {
+        expect(screen.getByTestId('notification-icon')).toBeInTheDocument();
+      } else {
+        expect(screen.queryByTestId('notification-icon')).toBeNull();
+      }
+
+      if (config?.dots) {
+        expect(screen.getByTestId('dots')).toBeInTheDocument();
+      } else {
+        expect(screen.queryByTestId('dots')).toBeNull();
+      }
+    });
+
+    test(`never invents a notification count on route ${route}`, () => {
+      renderHeader(route, { cartItems: [product(1, 1)] });
+
+      // Nothing is unread in this store. The badge that used to sit here said "2".
+      expect(screen.queryByTestId('notification-badge')).toBeNull();
     });
   });
 
   test('renders nothing for unknown route', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    renderHeader('/unknown' as any);
+    renderHeader('/unknown' as any, { cartItems: [product(1, 1)] });
 
     expect(screen.queryByTestId('user')).toBeNull();
     expect(screen.queryByTestId('btn-navigate-back')).toBeNull();
@@ -102,7 +154,11 @@ describe('Header component', () => {
   test('falls back to "/" if usePathname returns null', () => {
     mockUsePathname.mockReturnValue(null);
 
-    const { container } = render(<Header />);
+    const { container } = render(
+      <Provider store={createStore()}>
+        <Header />
+      </Provider>
+    );
 
     expect(container.querySelector('[data-testid="user"]')).toBeInTheDocument();
   });
@@ -165,7 +221,45 @@ describe('Header component', () => {
     const avatarImg = screen.getByRole('img') as HTMLImageElement;
     const username = screen.getByTestId('name-user');
 
-    expect(avatarImg.src).toContain(''); 
+    expect(avatarImg.src).toContain('');
     expect(username).toHaveTextContent('Guest');
+  });
+
+  describe('notification bell', () => {
+    test('opens the notifications screen', () => {
+      renderHeader('/');
+
+      fireEvent.click(screen.getByTestId('notification-icon'));
+
+      expect(pushMock).toHaveBeenCalledWith('/notifications');
+    });
+
+    test('badges the real unread count', () => {
+      renderHeader('/', {
+        notifications: [notification('a', false), notification('b', false), notification('c', true)],
+      });
+
+      expect(screen.getByTestId('notification-badge')).toHaveTextContent('2');
+    });
+
+    test('carries no badge when the inbox has been read', () => {
+      renderHeader('/', { notifications: [notification('a', true)] });
+
+      expect(screen.queryByTestId('notification-badge')).toBeNull();
+    });
+  });
+
+  describe('cart overflow menu', () => {
+    test('is offered on the cart when there is something to clear', () => {
+      renderHeader('/cart', { cartItems: [product(1, 2)] });
+
+      expect(screen.getByTestId('dots')).toBeInTheDocument();
+    });
+
+    test('is not offered on an empty cart', () => {
+      renderHeader('/cart', { cartItems: [] });
+
+      expect(screen.queryByTestId('dots')).toBeNull();
+    });
   });
 });

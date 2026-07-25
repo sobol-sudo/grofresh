@@ -5,6 +5,7 @@ import SearchRecently from "@/features/search-recently";
 import BrowseCategory from "@/widgets/browse-category";
 import DiscountCard from "@/widgets/discount-card";
 import PopularNow from "@/widgets/popular-now";
+import { BottomNavBar } from "@/features/bottom-nav-bar";
 
 export default function Home() {
   const router = useRouter();
@@ -44,6 +45,14 @@ export default function Home() {
           onSelectCategory={selectCategory}
         />
         <PopularNow query={query} categoryId={categoryId} onClearFilters={clearFilters} />
+
+        {/*
+          The tab bar only existed on the cart, which left Profile reachable from a
+          single screen. Home is where a tab bar belongs.
+        */}
+        <div className="container">
+          <BottomNavBar className="mt-[22px] mb-[33px]" />
+        </div>
       </div>
     </div>
   );
