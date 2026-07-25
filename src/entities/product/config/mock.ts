@@ -1,5 +1,15 @@
 import { IProduct } from "../model/types";
 
+/**
+ * The "Fresh Deals" promotion advertised on the home screen: 20% off every item in
+ * the two fresh-produce categories (Vegetables and Fruits). Nothing else is on offer,
+ * which is what "selected groceries" on the banner means.
+ *
+ * Produce is priced in 5-cent steps on purpose, so 20% off always lands on a whole
+ * cent and the struck-through price and the price charged agree exactly.
+ */
+export const FRESH_DEALS_PERCENT = 20;
+
 export const MOCK_PRODUCTS: IProduct[] = [
   {
     id: 1,
@@ -7,10 +17,11 @@ export const MOCK_PRODUCTS: IProduct[] = [
     name: "Baby Spinach",
     unitValue: 250,
     unit: "g",
-    price: 2.19,
+    price: 2.2,
     category: "Vegetables",
     category_id: 1,
     quantity: 0,
+    discountPercent: FRESH_DEALS_PERCENT,
   },
   {
     id: 2,
@@ -22,6 +33,7 @@ export const MOCK_PRODUCTS: IProduct[] = [
     category: "Vegetables",
     category_id: 1,
     quantity: 0,
+    discountPercent: FRESH_DEALS_PERCENT,
   },
   {
     id: 3,
@@ -33,6 +45,7 @@ export const MOCK_PRODUCTS: IProduct[] = [
     category: "Fruits",
     category_id: 5,
     quantity: 0,
+    discountPercent: FRESH_DEALS_PERCENT,
   },
   {
     id: 4,
@@ -40,10 +53,11 @@ export const MOCK_PRODUCTS: IProduct[] = [
     name: "Bananas",
     unitValue: 1,
     unit: "dozen",
-    price: 2.79,
+    price: 2.8,
     category: "Fruits",
     category_id: 5,
     quantity: 0,
+    discountPercent: FRESH_DEALS_PERCENT,
   },
   {
     id: 5,
@@ -55,6 +69,7 @@ export const MOCK_PRODUCTS: IProduct[] = [
     category: "Fruits",
     category_id: 5,
     quantity: 0,
+    discountPercent: FRESH_DEALS_PERCENT,
   },
   {
     id: 6,
@@ -165,6 +180,7 @@ export const MOCK_PRODUCTS: IProduct[] = [
     category: "Fruits",
     category_id: 5,
     quantity: 0,
+    discountPercent: FRESH_DEALS_PERCENT,
   },
   {
     id: 16,
@@ -183,9 +199,10 @@ export const MOCK_PRODUCTS: IProduct[] = [
     name: "Sweet Corn",
     unitValue: 200,
     unit: "g",
-    price: 2.49,
+    price: 2.5,
     category: "Vegetables",
     category_id: 1,
     quantity: 0,
+    discountPercent: FRESH_DEALS_PERCENT,
   },
 ];

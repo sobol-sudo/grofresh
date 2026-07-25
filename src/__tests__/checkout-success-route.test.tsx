@@ -46,7 +46,13 @@ describe("checkout-success route guard", () => {
   const renderPage = (lastOrder: Order | null) => {
     const store = configureStore({
       reducer: rootReducer,
-      preloadedState: { order: { lastOrder } },
+      preloadedState: {
+        order: {
+          orders: lastOrder ? [lastOrder] : [],
+          lastOrder,
+          isHydrated: true,
+        },
+      },
     });
 
     return render(

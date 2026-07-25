@@ -3,3 +3,5 @@ import type { IProduct } from './model/types'
 
 
 export { Product, ProductCart, IProduct }
+export { hasDiscount, discountedPrice, discountSavings } from './lib/price'
+export { selectDiscountedProducts, selectMaxDiscountPercent } from './model/selectors'
