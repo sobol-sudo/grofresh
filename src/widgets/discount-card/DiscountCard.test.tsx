@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import DiscountCard from './DiscountCard'
 
-// Мокаем next/image, чтобы не мешал при тестах
+// Mock next/image so it stays out of the way in tests
 jest.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt }: { src: string; alt: string }) => (
@@ -10,7 +10,7 @@ jest.mock('next/image', () => ({
   ),
 }))
 
-// Мокаем компонент Button
+// Mock the Button component
 jest.mock('@/shared/ui/Button', () => ({
   __esModule: true,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -18,7 +18,7 @@ jest.mock('@/shared/ui/Button', () => ({
 }))
 
 describe('DiscountCard component', () => {
-  // Проверяет, что отображается основной текст
+  // Renders the main copy
   test('renders discount text and description', () => {
     render(<DiscountCard />)
 
@@ -27,20 +27,20 @@ describe('DiscountCard component', () => {
     expect(screen.getByText(/Special prices on selected groceries/i)).toBeInTheDocument()
   })
 
-  // Проверяет, что отображается кнопка "Explore deals"
+  // Renders the "Explore deals" button
   test('renders the "Explore deals" button', () => {
     render(<DiscountCard />)
     expect(screen.getByRole('button', { name: /Explore deals/i })).toBeInTheDocument()
   })
 
-  // Проверяет, что картинка отображается с нужным src и alt
+  // Renders the image with the expected src and alt
   test('renders product discount image', () => {
     render(<DiscountCard />)
     const image = screen.getByAltText('Picture of the author')
     expect(image).toHaveAttribute('src', '/images/product-discount.png')
   })
 
-  // Проверяет, что переданный className применяется
+  // Applies the className that was passed in
   test('applies custom className', () => {
     const { container } = render(<DiscountCard className="custom-class" />)
     expect(container.firstChild).toHaveClass('custom-class')
