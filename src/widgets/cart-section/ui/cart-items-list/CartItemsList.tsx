@@ -24,7 +24,7 @@ export default function CartItemsList({ items, showDefaultItems }: CartItemsList
           height={150}
         />
         <p className="mt-4 text-gray-500 text-center">
-          В корзине пока ничего нет
+          Your cart is empty
         </p>
       </div>
     );
