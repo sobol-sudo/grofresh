@@ -15,7 +15,7 @@ describe("CartSummary component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-    // Корректно отображает общую цену
+    // Renders the total price correctly
   it("renders total price correctly", () => {
     mockUseAppSelector.mockImplementation((selector) => {
       if (selector === allPriceCartSelector) return 100;
@@ -28,7 +28,7 @@ describe("CartSummary component", () => {
     expect(screen.getByText("Discount up to 5%")).toBeInTheDocument();
   });
 
-      // Корректно отображает общую цену если isCheckoutMode false
+      // Renders the total price correctly when isCheckoutMode is false
   it("renders total price correctly", () => {
     mockUseAppSelector.mockImplementation((selector) => {
       if (selector === allPriceCartSelector) return 100;
@@ -41,7 +41,7 @@ describe("CartSummary component", () => {
     expect(screen.getByText("Discount up to 5%")).toBeInTheDocument();
   });
 
-  // отображает сумму как 0, если корзина пуста
+  // Shows a total of 0 when the cart is empty
   it("renders total as 0 if cart is empty", () => {
     mockUseAppSelector.mockImplementation((selector) => {
       if (selector === allPriceCartSelector) return 0;
@@ -53,7 +53,7 @@ describe("CartSummary component", () => {
     expect(screen.getByText("Total : $0.00")).toBeInTheDocument();
   });
 
-  // отключает кнопку, когда корзина пуста
+  // Disables the button when the cart is empty
   it("disables the button when cart is empty", () => {
     mockUseAppSelector.mockReturnValue(0);
 
@@ -63,7 +63,7 @@ describe("CartSummary component", () => {
     expect(button).toBeDisabled();
   });
 
-  // вызывает проверку при нажатии кнопки
+  // Fires the checkout handler when the button is clicked
   it("calls onCheckout when button clicked", () => {
     mockUseAppSelector.mockImplementation((selector) => {
       if (selector === allPriceCartSelector) return 200;
