@@ -9,7 +9,7 @@ import { cartReducer } from '@/entities/cart/model/cart.slice';
 import { HeaderConfig, headerConfig, HeaderRoute } from './config';
 import { useTelegram } from '@/shared/hooks/useTelegram/useTelegram';
 
-// --- Моки для next/router и next/navigation ---
+// --- Mocks for next/router and next/navigation ---
 jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }));
@@ -29,7 +29,7 @@ jest.mock('@/shared/ui/Avatar/Avatar', () => (props: any) => (
   <img data-testid="avatar" src={props.src} alt="avatar" />
 ));
 
-// --- Моки для UI компонентов ---
+// --- Mocks for the UI components ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('@/entities/cart/ui/CartIcon', () => (props: any) => (
   <button data-testid="cart-icon" {...props}>Cart</button>
@@ -37,7 +37,7 @@ jest.mock('@/entities/cart/ui/CartIcon', () => (props: any) => (
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('@/shared/ui/IconButton', () => (props: any) => <button {...props} />);
-// --- Простейший mock store для CartIcon ---
+// --- Minimal mock store for CartIcon ---
 const createStore = () =>
   configureStore({
     reducer: { cart: cartReducer },
@@ -68,7 +68,7 @@ describe('Header component', () => {
     );
   };
 
-  // Динамические тесты по конфигу
+  // Tests generated dynamically from the config
   (Object.keys(headerConfig) as HeaderRoute[]).forEach((route) => {
     test(`renders correct elements for route ${route}`, () => {
       renderHeader(route);
