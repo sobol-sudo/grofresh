@@ -2,14 +2,14 @@ import { render, screen } from '@testing-library/react'
 import CategoryCard from './CategoryCard'
 import { Category } from '../../../browse-category/model/types'
 
-// Мокаем next/image, чтобы тесты не падали из-за SSR специфики Next.js
+// Mock next/image so Next.js SSR specifics do not break the tests
 jest.mock('next/image', () => ({
   __esModule: true,
   // eslint-disable-next-line @next/next/no-img-element
   default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
 }))
 
-// Моковые данные категории
+// Mock category data
 const mockCategory: Category = {
   id: 1,
   name: 'Fruits',
@@ -17,20 +17,20 @@ const mockCategory: Category = {
 }
 
 describe('CategoryCard component', () => {
-  // Проверяет, что рендерится имя категории
+  // Renders the category name
   test('renders category name', () => {
     render(<CategoryCard category={mockCategory} />)
     expect(screen.getByText('Fruits')).toBeInTheDocument()
   })
 
-  // Проверяет, что отображается изображение с нужным src и alt
+  // Renders the image with the expected src and alt
   test('renders category image', () => {
     render(<CategoryCard category={mockCategory} />)
     const image = screen.getByAltText('category')
     expect(image).toHaveAttribute('src', mockCategory.image)
   })
 
-  // Проверяет, что карточка имеет базовые классы для стиля и наведения
+  // The card carries the base style and hover classes
   test('has correct base styles', () => {
     const { container } = render(<CategoryCard category={mockCategory} />)
     const card = container.firstChild as HTMLElement
