@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import PopularNow from './PopularNow';
 
-// Мокаем компонент Product, чтобы не зависеть от его логики
+// Mock the Product component so these tests do not depend on its logic
 jest.mock('@/entities/product', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Product: ({ product }: any) => (
@@ -9,7 +9,7 @@ jest.mock('@/entities/product', () => ({
   ),
 }));
 
-// Мокаем список продуктов
+// Mock the product list
 jest.mock('@/entities/product/config/mock', () => ({
   MOCK_PRODUCTS: [
     { id: 1, name: 'Apples' },
@@ -19,7 +19,7 @@ jest.mock('@/entities/product/config/mock', () => ({
 }));
 
 describe('PopularNow component', () => {
-  // Проверяет, что рендерится заголовок и кнопка
+  // Renders the heading and the button
   test('renders heading and "more" button', () => {
     render(<PopularNow />);
 
@@ -27,7 +27,7 @@ describe('PopularNow component', () => {
     expect(screen.getByText('more')).toBeInTheDocument();
   });
 
-  // Проверяет, что отображаются все продукты из MOCK_PRODUCTS
+  // Renders every product from MOCK_PRODUCTS
   test('renders all mock products', () => {
     render(<PopularNow />);
 
@@ -38,7 +38,7 @@ describe('PopularNow component', () => {
     expect(products[2]).toHaveTextContent('Oranges');
   });
 
-  // Проверяет, что контейнер и структура корректны
+  // The container and overall structure are correct
   test('has correct container structure', () => {
     const { container } = render(<PopularNow />);
     expect(container.querySelector('.container')).toBeInTheDocument();
