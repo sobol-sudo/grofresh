@@ -3,17 +3,17 @@ import Avatar from "./Avatar"
 
 describe('Avatar component', () => {
 
-  // Проверяет, что компонент рендерится с пропсами по умолчанию
+  // Renders with the default props
   test('renders with default props', () => {
     render(<Avatar />)
   })
 
-  // Проверяет, что компонент корректно рендерится с кастомным размером
+  // Renders correctly with a custom size
   test('renders with custom size', () => {
     render(<Avatar size={100} />)
   })
 
-  // Проверяет, что компонент корректно рендерится с кастомным src
+  // Renders correctly with a custom src
   test('renders with custom src', () => {
     render(<Avatar src="example-path" />)
   })
