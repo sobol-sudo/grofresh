@@ -1,13 +1,13 @@
-/* Применять к блоку с overflow: auto/scroll */
+/* Apply to any element that has overflow: auto/scroll */
 .minimal-scroll {
   overflow: auto;
-  -webkit-overflow-scrolling: touch; /* плавная прокрутка на iOS */
+  -webkit-overflow-scrolling: touch; /* momentum scrolling on iOS */
 }
 
 /* WebKit (Chrome, Safari, Edge) */
 .minimal-scroll::-webkit-scrollbar {
-  width: 12px;  /* увеличили ширину */
-  height: 12px; /* для горизонтального скролла */
+  width: 12px;  /* wider than the browser default */
+  height: 12px; /* for horizontal scrollbars */
 }
 
 .minimal-scroll::-webkit-scrollbar-track {
@@ -16,22 +16,22 @@
 
 .minimal-scroll::-webkit-scrollbar-thumb {
   background: var(--scroll-thumb, rgba(0,0,0,0.35));
-  border-radius: 6px; /* чуть меньше половины ширины для мягких краёв */
+  border-radius: 6px; /* just under half the width, for softly rounded edges */
   transition: background 0.18s ease, opacity 0.18s ease;
 }
 
-/* Hover state — чуть ярче */
+/* Hover state - a little more contrast */
 .minimal-scroll:hover::-webkit-scrollbar-thumb {
   background: var(--scroll-thumb-hover, rgba(0,0,0,0.55));
 }
 
 /* Firefox */
 .minimal-scroll {
-  scrollbar-width: auto; /* thin → auto, чтобы было потолще */
+  scrollbar-width: auto; /* thin -> auto so the bar is a bit thicker */
   scrollbar-color: var(--scroll-thumb, rgba(0,0,0,0.35)) var(--scroll-track, transparent);
 }
 
-/* Если хочешь, чтобы скролл был почти невидим и появлялся только при наведении */
+/* Opt-in variant: keep the scrollbar invisible until the user hovers */
 .minimal-scroll.hide-until-hover::-webkit-scrollbar-thumb {
   opacity: 0;
 }
@@ -47,10 +47,10 @@
   scrollbar-color: var(--scroll-thumb, rgba(0,0,0,0.35)) var(--scroll-track, transparent);
 }
 
-/* 🔹 Медиа-запрос: до 640px делаем скролл полностью невидимым */
+/* 🔹 Media query: hide the scrollbar completely below 640px */
 @media (max-width: 640px) {
   .minimal-scroll {
-    overflow: auto; /* оставляем прокрутку */
+    overflow: auto; /* keep scrolling enabled */
   }
 
   /* WebKit */
