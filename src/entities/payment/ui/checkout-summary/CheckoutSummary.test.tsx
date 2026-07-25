@@ -4,7 +4,7 @@ import * as hooks from "@/app/providers/store-provider/config/hooks";
 import { serviceFee, paymentMethod as paymentMethodSelector } from "@/entities/payment/model/payment.slice";
 import { allPriceCart as allPriceCartSelector } from "@/entities/cart/model/cart.slice";
 
-// Мокаем useAppSelector
+// Mock useAppSelector
 jest.mock("@/app/providers/store-provider/config/hooks", () => ({
   useAppSelector: jest.fn(),
 }));
