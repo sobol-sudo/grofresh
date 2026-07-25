@@ -10,16 +10,16 @@ describe('Input component', () => {
     handleChange.mockClear();
   });
 
-  // Проверяет, что компонент рендерится с переданным значением и реагирует на изменения
+  // Renders the value it is given and reacts to changes
   test('renders with default props and value', () => {
     render(<Input value={valueExample} handleChange={handleChange} />);
 
-    // Проверяет, что input отображается с правильным значением
+    // The input shows the correct value
     const input = screen.getByDisplayValue(valueExample);
     expect(input).toBeInTheDocument();
     expect(input).toHaveValue(valueExample);
 
-    // Проверяет, что при изменении значения вызывается handleChange
+    // Changing the value calls handleChange
     fireEvent.change(input, { target: { value: "new value" } });
     expect(handleChange).toHaveBeenCalledTimes(1);
   });
