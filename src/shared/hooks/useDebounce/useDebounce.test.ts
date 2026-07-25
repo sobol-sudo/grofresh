@@ -4,25 +4,25 @@ import useDebounce from './useDebounce';
 jest.useFakeTimers();
 
 describe('useDebounce', () => {
-  it('должен возвращать начальное значение сразу', () => {
+  it('returns the initial value immediately', () => {
     const { result } = renderHook(() => useDebounce('test', 500));
     expect(result.current).toBe('test');
   });
 
-  it('обновляет значение только после задержки', () => {
+  it('updates the value only after the delay has elapsed', () => {
     let value = 'initial';
     const { result, rerender } = renderHook(() => useDebounce(value));
 
     expect(result.current).toBe('initial');
 
-    // Меняем значение
+    // Change the value
     value = 'updated';
     rerender();
 
-    // Сразу debouncedValue не изменился
+    // debouncedValue has not changed yet
     expect(result.current).toBe('initial');
 
-    // Прокручиваем таймер на 500ms
+    // Advance the timer by 500ms
     act(() => {
       jest.advanceTimersByTime(500);
     });
@@ -30,21 +30,21 @@ describe('useDebounce', () => {
     expect(result.current).toBe('updated');
   });
 
-  it('очищает предыдущий таймер при быстром изменении значения', () => {
+  it('clears the pending timer when the value changes rapidly', () => {
     let value = 'first';
     const { result, rerender } = renderHook(() => useDebounce(value, 500));
 
-    // Меняем значение до истечения delay
+    // Change the value before the delay elapses
     value = 'second';
     rerender();
 
     act(() => {
-      jest.advanceTimersByTime(499); // ещё не истек
+      jest.advanceTimersByTime(499); // not elapsed yet
     });
-    expect(result.current).toBe('first'); // пока ещё старое значение
+    expect(result.current).toBe('first'); // still the previous value
 
     act(() => {
-      jest.advanceTimersByTime(1); // теперь прошло 500ms после последнего значения
+      jest.advanceTimersByTime(1); // 500ms have now passed since the last change
     });
     expect(result.current).toBe('second');
   });
