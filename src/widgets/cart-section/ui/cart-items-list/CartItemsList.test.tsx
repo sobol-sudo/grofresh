@@ -27,16 +27,16 @@ describe("CartItemsList component", () => {
     mockUseAppDispatch.mockReturnValue(jest.fn());
   });
 
-  // Проверяем рендер пустой корзины
+  // Renders the empty-cart state
   it("renders empty cart message when no items", () => {
     mockUseAppSelector.mockReturnValue(0);
     render(<CartItemsList items={[]} showDefaultItems={2} />);
 
     expect(screen.getByAltText("Empty cart")).toBeInTheDocument();
-    expect(screen.getByText("В корзине пока ничего нет")).toBeInTheDocument();
+    expect(screen.getByText("Your cart is empty")).toBeInTheDocument();
   });
 
-  // Проверяем рендер только части элементов
+  // Renders only the first slice of items
   it("renders only default items if items.length > showDefaultItems", () => {
     mockUseAppSelector.mockReturnValue(items.length);
     render(<CartItemsList items={items} showDefaultItems={2} />);
@@ -47,7 +47,7 @@ describe("CartItemsList component", () => {
     expect(screen.getByText("Show 1 more")).toBeInTheDocument();
   });
 
-  // Проверяем отображение всех элементов при клике на "Show more"
+  // Shows every item after clicking "Show more"
   it("shows all items when clicking 'Show more' and toggles to 'Less items'", () => {
     mockUseAppSelector.mockReturnValue(items.length);
     render(<CartItemsList items={items} showDefaultItems={2} />);
@@ -58,13 +58,13 @@ describe("CartItemsList component", () => {
     expect(screen.getByText("Orange")).toBeInTheDocument();
     expect(screen.getByText("Less items")).toBeInTheDocument();
 
-    // Кликаем снова для сворачивания
+    // Click again to collapse the list
     fireEvent.click(screen.getByText("Less items"));
     expect(screen.queryByText("Orange")).not.toBeInTheDocument();
     expect(screen.getByText("Show 1 more")).toBeInTheDocument();
   });
 
-  // Проверяем, что кнопка "Show more" не появляется если items.length <= showDefaultItems
+  // The "Show more" toggle is hidden when items.length <= showDefaultItems
   it("does not render toggle button if items.length <= showDefaultItems", () => {
     mockUseAppSelector.mockReturnValue(2);
     render(<CartItemsList items={items.slice(0, 2)} showDefaultItems={2} />);
